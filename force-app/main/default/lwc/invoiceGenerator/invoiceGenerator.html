@@ -1,0 +1,154 @@
+<template>
+    <header class="slds-modal__header">
+        <h2 class="slds-text-heading_medium">Adorned by Veena: Invoice Wizard</h2>
+    </header>
+
+    <div class="slds-modal__content slds-p-around_medium" style="min-height: 550px; position: relative;">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={isStep1}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Service Line Items</div>
+            <div class="slds-scrollable_y" style="max-height: 420px;">
+                <template for:each={rows} for:item="row">
+                    <div key={row.id} class="slds-box slds-m-bottom_medium slds-theme_shade slds-is-relative">
+                        <lightning-record-edit-form object-api-name="Line_Item__c" record-id={row.recordId} onsuccess={handleLineItemSuccess}>
+                            <div class="slds-hide">
+                                <lightning-input-field field-name="Event__c" value={recordId}></lightning-input-field>
+                            </div>
+                            <div class="slds-grid slds-gutters slds-wrap">
+                                <div class="slds-col slds-size_4-of-12">
+                                    <lightning-input-field field-name="Product__c" required></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <lightning-input-field field-name="Quantity__c" required></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_3-of-12">
+                                    <lightning-input-field field-name="Sales_Price__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12">
+                                    <lightning-input-field field-name="Discount__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12 slds-p-top_large slds-text-align_right">
+                                    <lightning-button-icon icon-name="utility:delete" variant="error" data-id={row.id} onclick={removeRow}></lightning-button-icon>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                    <lightning-input-field field-name="Description__c"></lightning-input-field>
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                </template>
+            </div>
+            <div class="slds-p-top_medium">
+                <lightning-button label="+ Add Another Item" icon-name="utility:add" onclick={addRow}></lightning-button>
+            </div>
+        </template>
+
+        <template if:true={isStep2}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">2. Invoice Details</div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity" data-id="oppForm" onsuccess={handleOppSuccess} onerror={handleFormError}>
+                        <div class="slds-box slds-theme_shade">
+                            <lightning-input-field field-name="Name"></lightning-input-field>
+                            <lightning-input-field field-name="Total_Amount__c"></lightning-input-field>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+                <div class="slds-col slds-size_1-of-2">
+                    <lightning-record-edit-form record-id={accountId} object-api-name="Account" data-id="accForm" onsuccess={handleAccSuccess} onerror={handleFormError}>
+                        <div class="slds-box slds-theme_shade">
+                            <lightning-input-field field-name="Name"></lightning-input-field>
+                            <lightning-input-field field-name="PersonEmail" required></lightning-input-field>
+                            <lightning-input-field field-name="PersonMobilePhone" required></lightning-input-field>
+                            <lightning-input-field field-name="BillingStreet"></lightning-input-field>
+                            <lightning-input-field field-name="BillingCity"></lightning-input-field>
+                            <lightning-input-field field-name="BillingState"></lightning-input-field>
+                            <lightning-input-field field-name="BillingPostalCode"></lightning-input-field>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={isStep3}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">3. Reference Pictures</div>
+            <div class="slds-box slds-theme_shade">
+                <lightning-input 
+                    type="file" 
+                    label="Upload Design References" 
+                    accept=".jpg, .jpeg, .png, .gif, .tiff, .tif, .webp, .avif, .svg, .eps" 
+                    multiple 
+                    onchange={handleFileChange}>
+                </lightning-input>
+                
+                <template if:true={uploadedImages.length}>
+                    <div class="slds-m-top_medium">
+                        <template for:each={uploadedImages} for:item="img">
+                            <div key={img.id} class="slds-grid slds-gutters slds-m-bottom_small slds-vertical-align-center slds-box slds-theme_default">
+                                <div class="slds-col slds-size_2-of-12 slds-text-align_center">
+                                    <img src={img.base64} style="max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" />
+                                </div>
+                                <div class="slds-col slds-size_9-of-12">
+                                    <lightning-input type="text" value={img.customName} data-id={img.id} onchange={handleImageRename} label="Image Display Name"></lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-12 slds-p-top_large">
+                                    <lightning-button-icon icon-name="utility:delete" variant="error" data-id={img.id} onclick={removeImage}></lightning-button-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <template if:true={isStep4}>
+            <div class="slds-box slds-theme_shade slds-text-align_center slds-m-top_large slds-p-around_xx-large">
+                <lightning-icon icon-name="doctype:pdf" size="large"></lightning-icon>
+                <h3 class="slds-text-heading_medium slds-m-top_medium">Document Generated</h3>
+                <p class="slds-m-bottom_large slds-text-color_weak">Click below to open the preview in a secure tab.</p>
+                <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                    <button class="slds-button slds-button_outline-brand slds-p-horizontal_medium slds-p-vertical_x-small">
+                        <lightning-icon icon-name="utility:preview" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        View PDF Preview
+                    </button>
+                </a>
+            </div>
+        </template>
+
+        <template if:true={isStep5}>
+            <div class="slds-box slds-theme_shade">
+                <lightning-flow 
+                    flow-api-name="Invoice_Contract_Email_Flow" 
+                    flow-input-variables={flowVariables}
+                    onstatuschange={handleFlowStatusChange}>
+                </lightning-flow>
+            </div>
+        </template>
+    </div>
+
+    <template if:false={isStep5}>
+        <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+            <div>
+                <lightning-button label="Cancel" onclick={closeAction} if:true={isStep1}></lightning-button>
+                <lightning-button label="Back" onclick={goBack} if:false={isStep1}></lightning-button>
+            </div>
+            <div>
+                <template if:true={isStep1}>
+                    <lightning-button label="Next: Edit Details" variant="brand" onclick={saveStep1}></lightning-button>
+                </template>
+                <template if:true={isStep2}>
+                    <lightning-button label="Next: Reference Images" variant="brand" onclick={saveStep2}></lightning-button>
+                </template>
+                <template if:true={isStep3}>
+                    <lightning-button label="Next: Generate PDF" variant="brand" onclick={saveStep3}></lightning-button>
+                </template>
+                <template if:true={isStep4}>
+                    <lightning-button label="Next: Prepare Email" variant="brand" onclick={saveAndSend}></lightning-button>
+                </template>
+            </div>
+        </footer>
+    </template>
+</template>

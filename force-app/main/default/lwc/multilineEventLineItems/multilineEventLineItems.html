@@ -1,0 +1,59 @@
+<template>
+    <lightning-card title="Add Event Items" icon-name="standard:quotes">
+        
+        <template if:true={isSaving}>
+            <lightning-spinner alternative-text="Saving..." size="medium"></lightning-spinner>
+        </template>
+
+        <div class="slds-p-around_medium slds-scrollable_y slds-is-relative" style="max-height: 60vh;">
+            <template for:each={rows} for:item="row">
+                <div key={row.id} class="slds-box slds-m-bottom_medium slds-theme_shade">
+                    
+                    <lightning-record-edit-form 
+                        object-api-name="Line_Item__c" 
+                        onsuccess={handleSuccess} 
+                        onerror={handleError}
+                        class="line-item-form">
+                        
+                        <lightning-messages></lightning-messages>
+
+                        <div class="slds-hide">
+                            <lightning-input-field field-name="Event__c" value={recordId}></lightning-input-field>
+                        </div>
+
+                        <div class="slds-grid slds-gutters slds-wrap">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <lightning-input-field field-name="Product__c" required></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12">
+                                <lightning-input-field field-name="Quantity__c" required></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12">
+                                <lightning-input-field field-name="Sales_Price__c"></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12">
+                                <lightning-input-field field-name="Discount__c"></lightning-input-field>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-12 slds-p-top_large slds-text-align_right">
+                                <lightning-button-icon 
+                                    icon-name="utility:delete" 
+                                    variant="error" 
+                                    data-id={row.id} 
+                                    onclick={removeRow}>
+                                </lightning-button-icon>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                <lightning-input-field field-name="Description__c"></lightning-input-field>
+                            </div>
+                        </div>
+                    </lightning-record-edit-form>
+                </div>
+            </template>
+        </div>
+
+        <div class="slds-p-around_medium slds-text-align_center slds-border_top">
+            <lightning-button label="+ Add Another Item" onclick={addRow} variant="neutral" class="slds-m-right_small"></lightning-button>
+            <lightning-button label="Save All Items" onclick={saveAll} variant="brand"></lightning-button>
+        </div>
+    </lightning-card>
+</template>

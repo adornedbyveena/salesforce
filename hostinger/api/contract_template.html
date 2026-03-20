@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        margin: 12mm 14mm 12mm 14mm;
+        background-color: #F7E7CE;
+    }
+
+    body {
+        font-family: montserrat, dejavusans, sans-serif;
+        font-size: 10pt;
+        color: #020C1D;
+        background-color: #F7E7CE;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ---- HEADER ---- */
+    .header-table {
+        width: 100%;
+        margin-bottom: 8mm;
+    }
+
+    .doc-title {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #020C1D;
+        vertical-align: middle;
+        letter-spacing: 0.5pt;
+    }
+
+    .logo-cell {
+        text-align: right;
+        vertical-align: middle;
+        width: 28mm;
+    }
+
+    .logo-cell img {
+        width: 26mm;
+    }
+
+    /* ---- GOLD SEPARATORS ---- */
+    .gold-line {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 5mm 0;
+    }
+
+    .gold-line td {
+        border-top: 1.5pt solid #D4AF37;
+        font-size: 0;
+        line-height: 0;
+        padding: 0;
+    }
+
+    /* ---- SECTION HEADINGS ---- */
+    h2 {
+        font-family: montserrat, dejavusans, sans-serif;
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #020C1D;
+        margin: 4mm 0 2mm 0;
+        text-transform: uppercase;
+        letter-spacing: 1pt;
+    }
+
+    h3 {
+        font-family: montserrat, dejavusans, sans-serif;
+        font-size: 10pt;
+        font-weight: bold;
+        color: #020C1D;
+        margin: 3mm 0 1mm 0;
+    }
+
+    p {
+        margin: 1.5mm 0;
+    }
+
+    /* ---- INDENTS ---- */
+    .indent {
+        margin-left: 5mm;
+    }
+
+    .indent2 {
+        margin-left: 10mm;
+    }
+
+    /* ---- LINE ITEMS TABLE ---- */
+    .line-items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 3mm 0 4mm 0;
+    }
+
+    .line-items-table th {
+        background-color: #D4AF37;
+        color: #020C1D;
+        font-family: montserrat, dejavusans, sans-serif;
+        font-weight: bold;
+        padding: 2.5mm 3mm;
+        text-align: left;
+        font-size: 9pt;
+    }
+
+    .line-items-table td {
+        padding: 2mm 3mm;
+        font-size: 9.5pt;
+        border-bottom: 0.5pt solid #D4AF37;
+        vertical-align: top;
+    }
+
+    .line-name {
+        width: 35%;
+        font-weight: bold;
+    }
+
+    .line-qty {
+        width: 10%;
+        text-align: center;
+    }
+
+    .line-desc {
+        width: 55%;
+    }
+
+    /* ---- SIGNATURE BLOCK ---- */
+    .sig-table {
+        width: 100%;
+        margin-top: 10mm;
+    }
+
+    .sig-line {
+        border-top: 0.8pt solid #020C1D;
+        padding-top: 2mm;
+        font-size: 10pt;
+    }
+
+    /* ---- CONTACT NOTE ---- */
+    .contact-note {
+        font-style: italic;
+        color: #D4AF37;
+        font-size: 9pt;
+        margin: 5mm 0 3mm 0;
+    }
+
+    em {
+        font-style: italic;
+        color: #555;
+        font-size: 9.5pt;
+    }
+</style>
+</head>
+<body>
+
+<!-- ================================================================ -->
+<!-- HEADER                                                            -->
+<!-- ================================================================ -->
+<table class="header-table">
+    <tr>
+        <td class="doc-title">EVENT PLANNING &amp; DÉCOR CONTRACT</td>
+        <td class="logo-cell"><img src="logo.png" /></td>
+    </tr>
+</table>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- INTRODUCTION                                                      -->
+<!-- ================================================================ -->
+<h2>Introduction</h2>
+<p>This Event Planning / Decor Contract Agreement ("Agreement") is entered into on <strong>{{CREATED_DATE}}</strong> by and between:</p>
+<p class="indent">• <strong>Adorned By Veena, LLC</strong>, a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at 19730 Shinnery Ridge Ct, Cypress, TX 77433, represented by Veena Boppana, Principal Designer (the "Company")</p>
+<p class="indent">• <strong>{{CLIENT_NAME}}</strong>, an individual residing at {{CLIENT_ADDRESS}} ("the Client").</p>
+<p>The parties hereby agree as follows:</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- SCOPE OF SERVICES                                                 -->
+<!-- ================================================================ -->
+<h2>Scope of Services</h2>
+
+<h3>Event Planning Services</h3>
+<p class="indent">The Company agrees to provide the following services for the event hosted by the Client:</p>
+
+<table class="line-items-table">
+    <thead>
+        <tr>
+            <th class="line-name">Service / Product</th>
+            <th class="line-qty">Qty</th>
+            <th class="line-desc">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{LINE_ITEMS}}
+    </tbody>
+</table>
+
+<p class="indent">These services will be provided in accordance with the terms outlined in this Agreement.</p>
+
+<h3>Exclusions</h3>
+<p class="indent">The following services are excluded from this Agreement:</p>
+<p class="indent2">• Travel or accommodation costs for The Company or Client unless otherwise specified.</p>
+<p class="indent2">• Insurance for the event (Client will need to secure separate insurance coverage).</p>
+<p class="indent2">• Costs for any services or items not explicitly mentioned in this Agreement.</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- EVENT DETAILS                                                     -->
+<!-- ================================================================ -->
+<h2>Event Details</h2>
+<p class="indent2">• <strong>Event Name:</strong> {{EVENT_NAME}}</p>
+<p class="indent2">• <strong>Event Date:</strong> {{EVENT_DATE}}</p>
+<p class="indent2">• <strong>Event Location:</strong> {{VENUE}}</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- COMPENSATION AND PAYMENT TERMS                                    -->
+<!-- ================================================================ -->
+<h2>Compensation and Payment Terms</h2>
+
+<h3>Fees</h3>
+<p class="indent2">• Flat Event Planning Fee: <strong>${{TOTAL_AMOUNT}}</strong> for all planning and coordination services.</p>
+
+<h3>Payment Schedule</h3>
+<h3>Deposit:</h3>
+<p class="indent2">• {{DEPOSIT_STRING}}</p>
+
+<h3>Final Payment:</h3>
+<p class="indent2">• The remaining balance of <strong>${{BALANCE}}</strong> is due no later than the day of the event.</p>
+
+<p class="indent"><em>Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.
+Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.
+Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: in the memo.</em></p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- RESPONSIBILITIES OF THE PARTIES                                   -->
+<!-- ================================================================ -->
+<h2>Responsibilities of the Parties</h2>
+
+<h3>The Company's Responsibilities</h3>
+<p class="indent2">• Provide event planning services as outlined in this Agreement.</p>
+<p class="indent2">• Coordinate and manage vendors, venue, and logistics for the event.</p>
+<p class="indent2">• Ensure all event-related activities are completed as scheduled.</p>
+<p class="indent2">• Maintain communication with Clients to ensure satisfaction and resolve any issues.</p>
+<p class="indent2">• Provide on-site event management to ensure smooth operations during the event.</p>
+
+<h3>Client's Responsibilities</h3>
+<p class="indent2">• <strong>Information Accuracy:</strong> Provide all event goals, themes, and budget constraints.</p>
+<p class="indent2">• <strong>Decision-Making Authority:</strong> Client must designate one (1) primary point of contact with full authority to make binding decisions and approvals.</p>
+<p class="indent2">• <strong>Financial Obligations:</strong> Ensure timely payments of planning fees and direct vendor invoices.</p>
+<p class="indent2">• <strong>Approvals:</strong> Review and approve designs and contracts within 72 hours of receipt.</p>
+<p class="indent2">• <strong>Venue Logistics:</strong> Provide all necessary access codes, loading-dock info, and permits.</p>
+<p class="indent2">• <strong>Third-Party Agreements:</strong> Client shall sign and be solely responsible for all vendor contracts.</p>
+<p class="indent2">• <strong>Conduct &amp; Liability:</strong> Client is responsible for guest behavior and any damages caused by attendees.</p>
+<p class="indent2">• <strong>Proof of Insurance (COI):</strong> Client is responsible for obtaining 'Event Cancellation' or 'Host Liability' insurance if required by the venue.</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- CHANGES AND CANCELLATIONS                                         -->
+<!-- ================================================================ -->
+<h2>Changes and Cancellations</h2>
+
+<h3>Changes to the Event Scope</h3>
+<p class="indent">If Client wishes to make significant changes to the event scope, such as increasing the number of attendees, adding services, or changing the event date, such changes will be documented and may result in additional charges. Changes must be communicated to The Company in writing and approved by both parties.</p>
+
+<h3>Event Cancellation</h3>
+<p class="indent">If the event is canceled by the Client:</p>
+<p class="indent2">• <strong>More than 15 days prior to event date:</strong> Client will be responsible for paying 50% of the total fees (deposit and planning services).</p>
+<p class="indent2">• <strong>Less than 15 days prior to event date:</strong> Client will be responsible for paying 100% of the total fees (deposit and planning services).</p>
+
+<h3>Force Majeure &amp; Limited Liability</h3>
+<p class="indent2">• If The Company is unable to perform due to circumstances beyond their reasonable control, including but not limited to hurricanes, tropical storms, regional power grid failures, or other Acts of God — the Company's liability shall be limited to refund of the unearned portion of the deposit.</p>
+<p class="indent2">• The Company shall be entitled to retain a prorated amount of the deposit to compensate for services already rendered (e.g., planning hours, site visits, and administrative costs) up to the date of the event. Neither party shall be liable for any further indirect, consequential, or damages.</p>
+<p class="indent">This Agreement is governed by the laws of the State of Texas. Any disputes shall be resolved via mandatory mediation in Harris County, Texas, prior to the filing of any lawsuit.</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- CONFIDENTIALITY                                                   -->
+<!-- ================================================================ -->
+<h2>Confidentiality</h2>
+<p class="indent2">• Both parties agree to keep all sensitive information confidential, including but not limited to event details, pricing, and any proprietary business information disclosed during the term of this Agreement.</p>
+<p class="indent2">• This confidentiality obligation will survive the termination of this Agreement.</p>
+
+<!-- ================================================================ -->
+<!-- GOVERNING LAW                                                     -->
+<!-- ================================================================ -->
+<h2>Governing Law</h2>
+<p class="indent2">• This Agreement shall be governed by and construed in accordance with the laws of the State of Texas.</p>
+<p class="indent2">• Any disputes arising from this Agreement will be resolved in the courts located in Harris County, Texas.</p>
+
+<!-- ================================================================ -->
+<!-- MISCELLANEOUS PROVISIONS                                          -->
+<!-- ================================================================ -->
+<h2>Miscellaneous Provisions</h2>
+
+<h3>Entire Agreement</h3>
+<p class="indent2">• This Agreement constitutes the full and complete understanding between the parties regarding the event planning services and supersedes all prior agreements or understandings, whether written or oral.</p>
+
+<h3>Amendments</h3>
+<p class="indent2">• Any amendments or modifications to this Agreement must be made in writing and signed by both parties.</p>
+
+<h3>Severability</h3>
+<p class="indent2">• If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+
+<!-- ================================================================ -->
+<!-- CONTACT NOTE                                                      -->
+<!-- ================================================================ -->
+<p class="contact-note">For any inquiries regarding this agreement, please contact Veena Boppana at veena@adornedbyveena.com</p>
+
+<table class="gold-line"><tr><td>&nbsp;</td></tr></table>
+
+<!-- ================================================================ -->
+<!-- SIGNATURES                                                        -->
+<!-- ================================================================ -->
+<table class="sig-table">
+    <tr>
+        <td style="width: 45%; vertical-align: top;">
+            <div class="sig-line">
+                <strong>Adorned by Veena</strong><br/>
+                Date: _________________
+            </div>
+        </td>
+        <td style="width: 10%;"></td>
+        <td style="width: 45%; vertical-align: top;">
+            <div class="sig-line">
+                <strong>{{CLIENT_NAME}}</strong><br/>
+                Date: _________________
+            </div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

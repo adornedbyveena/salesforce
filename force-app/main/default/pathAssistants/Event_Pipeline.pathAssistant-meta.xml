@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Opportunity</entityName>
+    <fieldName>StageName</fieldName>
+    <masterLabel>Event Pipeline</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>CloseDate</fieldNames>
+        <fieldNames>Venue__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Lock the Calendar:&lt;/strong&gt; The deposit has cleared! Ensure this Event Date is officially blocked off on the master production calendar.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Order Inventory:&lt;/strong&gt; Review the itemized decor list. Do you need to order any custom florals, neon signs, or specific linens for this project? Order them now.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Schedule Final Walkthrough:&lt;/strong&gt; Reach out to the client to schedule a final venue walkthrough or detail-confirmation call 30 days prior to the event.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Final Payment:&lt;/strong&gt; Set a reminder task for when the final balance is due (usually 14-30 days before the Event Date).&lt;/p&gt;</info>
+        <picklistValueName>Booked</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>Estimated_Budget__c</fieldNames>
+        <fieldNames>ExpectedRevenue</fieldNames>
+        <fieldNames>Venue__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Add Decor Items:&lt;/strong&gt; Click &amp;#39;Add Products&amp;#39; to build the quote with specific decor elements, backdrops, and floral packages.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Include Logistics:&lt;/strong&gt; Don&amp;#39;t forget to add line items for Delivery, Setup, and Teardown fees!&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Review Pricing:&lt;/strong&gt; Double-check all quantities and ensure the final &amp;#39;Project Total&amp;#39; makes sense for the scale of the event.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Next Step:&lt;/strong&gt; Generate and preview the PDF Proposal. Once it looks perfect and is emailed to the client, move the stage to &amp;#39;Quote &amp;amp; Contract Sent&lt;/p&gt;</info>
+        <picklistValueName>Building Proposal</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Venue__c</fieldNames>
+        <fieldNames>Services__c</fieldNames>
+        <fieldNames>Date_Flexibility__c</fieldNames>
+        <fieldNames>Alternative_Event_Date__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;The Vision:&lt;/strong&gt; Discuss color palettes, themes, and review any inspiration photos.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;The Venue:&lt;/strong&gt; Confirm the exact venue address and ask about any specific venue restrictions (e.g., delivery time windows, no open flames, ceiling rigging rules).&lt;/p&gt;&lt;p&gt;&lt;strong&gt;The Budget:&lt;/strong&gt; Re-confirm their estimated budget aligns with their must-have items.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Next Step:&lt;/strong&gt; Once you have the details, move the stage to &amp;#39;Building Proposal&amp;#39; and start adding the decor Line Items!&lt;/p&gt;</info>
+        <picklistValueName>Consultation Scheduled</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Amount</fieldNames>
+        <fieldNames>CloseDate</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Counter-Sign:&lt;/strong&gt; Review the signed contract, ensure all client details are correct, and counter-sign if necessary.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Invoice the Retainer:&lt;/strong&gt; Send the client the invoice for their initial deposit/retainer fee.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Confirm Details:&lt;/strong&gt; Remind the client that their Event Date is only fully secured once the payment clears.&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Next Step:&lt;/strong&gt; As soon as the deposit hits the bank account, pop the champagne and move this stage to &amp;#39;Booked&amp;#39;!&lt;/p&gt;</info>
+        <picklistValueName>Contract Signed</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>AccountId</fieldNames>
+        <fieldNames>Name</fieldNames>
+        <fieldNames>CloseDate</fieldNames>
+        <fieldNames>Event_Type__c</fieldNames>
+        <fieldNames>Services__c</fieldNames>
+        <info>&lt;p&gt;&lt;strong&gt;Check Availability:&lt;/strong&gt; Is the Event Date open on the production calendar? (If not, check to see if they provided an Alternative Date).&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Review Scope:&lt;/strong&gt; Look at the Event Type and Estimated Budget. Is this project a good fit for the current workload?&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Next Step:&lt;/strong&gt; Send the &amp;quot;Welcome &amp;amp; Next Steps&amp;quot; email template with the link to schedule their consultation.&lt;/p&gt;</info>
+        <picklistValueName>New Inquiry</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>Event</recordTypeName>
+</PathAssistant>

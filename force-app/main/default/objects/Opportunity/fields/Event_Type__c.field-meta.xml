@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Event_Type__c</fullName>
+    <label>Event Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Wedding Ceremony</fullName>
+                <default>false</default>
+                <label>Wedding Ceremony</label>
+            </value>
+            <value>
+                <fullName>Wedding Ceremony &amp; Reception</fullName>
+                <default>false</default>
+                <label>Wedding Ceremony &amp; Reception</label>
+            </value>
+            <value>
+                <fullName>Wedding Reception</fullName>
+                <default>false</default>
+                <label>Wedding Reception</label>
+            </value>
+            <value>
+                <fullName>Wedding Other</fullName>
+                <default>false</default>
+                <label>Wedding Other</label>
+            </value>
+            <value>
+                <fullName>Anniversary</fullName>
+                <default>false</default>
+                <label>Anniversary</label>
+            </value>
+            <value>
+                <fullName>Baby Shower</fullName>
+                <default>false</default>
+                <label>Baby Shower</label>
+            </value>
+            <value>
+                <fullName>Bridal Shower</fullName>
+                <default>false</default>
+                <label>Bridal Shower</label>
+            </value>
+            <value>
+                <fullName>Coming-of-Age Ceremony</fullName>
+                <default>false</default>
+                <label>Coming-of-Age Ceremony</label>
+            </value>
+            <value>
+                <fullName>Bar/Bat Mitzvah</fullName>
+                <default>false</default>
+                <label>Bar/Bat Mitzvah</label>
+            </value>
+            <value>
+                <fullName>Graduation</fullName>
+                <default>false</default>
+                <label>Graduation</label>
+            </value>
+            <value>
+                <fullName>Holiday Party</fullName>
+                <default>false</default>
+                <label>Holiday Party</label>
+            </value>
+            <value>
+                <fullName>Cocktail Reception</fullName>
+                <default>false</default>
+                <label>Cocktail Reception</label>
+            </value>
+            <value>
+                <fullName>Memorial Service</fullName>
+                <default>false</default>
+                <label>Memorial Service</label>
+            </value>
+            <value>
+                <fullName>Conference</fullName>
+                <default>false</default>
+                <label>Conference</label>
+            </value>
+            <value>
+                <fullName>Corporate Retreat</fullName>
+                <default>false</default>
+                <label>Corporate Retreat</label>
+            </value>
+            <value>
+                <fullName>Meeting</fullName>
+                <default>false</default>
+                <label>Meeting</label>
+            </value>
+            <value>
+                <fullName>Seminar</fullName>
+                <default>false</default>
+                <label>Seminar</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
