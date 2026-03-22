@@ -1,0 +1,2 @@
+# Block all direct web access to CSRF token files
+Require all denied

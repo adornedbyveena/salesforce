@@ -1,0 +1,5 @@
+# Rewrite /contract/{opportunityId} → /contract/index.php?id={opportunityId}
+Options -Indexes
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-zA-Z0-9]{15,18})/?$ index.php?id=$1 [L,QSA]
