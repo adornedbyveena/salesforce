@@ -268,22 +268,16 @@
     </actionOverrides>
     <actionOverrides>
         <actionName>View</actionName>
-        <comment>Action override created by Lightning App Builder during activation.</comment>
-        <content>Contact</content>
-        <formFactor>Small</formFactor>
-        <skipRecordTypeSelect>false</skipRecordTypeSelect>
-        <type>Flexipage</type>
+        <type>Default</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>View</actionName>
-        <comment>Action override created by Lightning App Builder during activation.</comment>
-        <content>Contact</content>
         <formFactor>Large</formFactor>
-        <skipRecordTypeSelect>false</skipRecordTypeSelect>
-        <type>Flexipage</type>
+        <type>Default</type>
     </actionOverrides>
     <actionOverrides>
         <actionName>View</actionName>
+        <formFactor>Small</formFactor>
         <type>Default</type>
     </actionOverrides>
     <actionOverrides>

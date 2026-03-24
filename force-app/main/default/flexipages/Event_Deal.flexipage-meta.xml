@@ -13,13 +13,13 @@
                             <value>Opportunity.Add_Line_Items</value>
                         </valueListItems>
                         <valueListItems>
+                            <value>Delete</value>
+                        </valueListItems>
+                        <valueListItems>
                             <value>Opportunity.Generate_Contract</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Opportunity.Generate_Invoice</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>Delete</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -113,6 +113,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.Client_Email__c</fieldItem>
                 <identifier>RecordClient_Email__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Event_Description__c</fieldItem>
+                <identifier>RecordEvent_Description__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-b78f7bac-0a71-4404-bdfe-7a72d92b231c</name>
@@ -578,32 +588,6 @@
                 </componentInstanceProperties>
                 <componentName>lst:dynamicRelatedList</componentName>
                 <identifier>lst_dynamicRelatedList</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>parentFieldApiName</name>
-                    <value>Opportunity.Id</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListApiName</name>
-                    <value>AttachedContentNotes</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListComponentOverride</name>
-                    <value>NONE</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>rowsToDisplay</name>
-                    <value>10</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>showActionBar</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentName>force:relatedListSingleContainer</componentName>
-                <identifier>force_relatedListSingleContainer</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Wedding Ceremony</fullName>
+        <default>false</default>
+        <label>Wedding Ceremony</label>
+    </customValue>
+    <customValue>
+        <fullName>Wedding Reception</fullName>
+        <default>false</default>
+        <label>Wedding Reception</label>
+    </customValue>
+    <customValue>
+        <fullName>Wedding Ceremony &amp; Reception</fullName>
+        <default>false</default>
+        <label>Wedding Ceremony &amp; Reception</label>
+    </customValue>
+    <customValue>
+        <fullName>Wedding Other</fullName>
+        <default>false</default>
+        <label>Wedding Other</label>
+    </customValue>
+    <customValue>
+        <fullName>Anniversary</fullName>
+        <default>false</default>
+        <label>Anniversary</label>
+    </customValue>
+    <customValue>
+        <fullName>Baby Shower</fullName>
+        <default>false</default>
+        <label>Baby Shower</label>
+    </customValue>
+    <customValue>
+        <fullName>Bridal Shower</fullName>
+        <default>false</default>
+        <label>Bridal Shower</label>
+    </customValue>
+    <customValue>
+        <fullName>Coming-of-Age Ceremony</fullName>
+        <default>false</default>
+        <label>Coming-of-Age Ceremony</label>
+    </customValue>
+    <customValue>
+        <fullName>Bar/Bat Mitzvah</fullName>
+        <default>false</default>
+        <label>Bar/Bat Mitzvah</label>
+    </customValue>
+    <customValue>
+        <fullName>Graduation</fullName>
+        <default>false</default>
+        <label>Graduation</label>
+    </customValue>
+    <customValue>
+        <fullName>Holiday Party</fullName>
+        <default>false</default>
+        <label>Holiday Party</label>
+    </customValue>
+    <customValue>
+        <fullName>Cocktail Reception</fullName>
+        <default>false</default>
+        <label>Cocktail Reception</label>
+    </customValue>
+    <customValue>
+        <fullName>Memorial Service</fullName>
+        <default>false</default>
+        <label>Memorial Service</label>
+    </customValue>
+    <customValue>
+        <fullName>Conference</fullName>
+        <default>false</default>
+        <label>Conference</label>
+    </customValue>
+    <customValue>
+        <fullName>Corporate Retreat</fullName>
+        <default>false</default>
+        <label>Corporate Retreat</label>
+    </customValue>
+    <customValue>
+        <fullName>Meeting</fullName>
+        <default>false</default>
+        <label>Meeting</label>
+    </customValue>
+    <customValue>
+        <fullName>Seminar</fullName>
+        <default>false</default>
+        <label>Seminar</label>
+    </customValue>
+    <customValue>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+    </customValue>
+    <masterLabel>Event Type</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

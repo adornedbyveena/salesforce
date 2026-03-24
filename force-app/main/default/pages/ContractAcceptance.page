@@ -1,0 +1,152 @@
+<apex:page controller="ContractSiteController" showHeader="false" standardStylesheets="false" sidebar="false" docType="html-5.0">
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Contract – Adorned By Veena</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+
+        .abv-header {
+            background: #D4AF37;
+            padding: 20px 32px;
+            text-align: center;
+        }
+        .abv-header h1 {
+            color: #fff;
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .abv-container {
+            max-width: 900px;
+            margin: 32px auto;
+            padding: 0 16px 64px;
+        }
+
+        .abv-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 48px;
+        }
+
+        .abv-status {
+            text-align: center;
+            padding: 20px 0 28px;
+            font-size: 17px;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 28px;
+        }
+
+        .abv-status.success { color: #2e7d32; font-weight: bold; font-size: 18px; border: none; }
+        .abv-status.declined { color: #c62828; border: none; }
+
+        .contract-content {
+            margin-bottom: 8px;
+        }
+
+        .abv-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 2px solid #f0e6c0;
+            flex-wrap: wrap;
+        }
+
+        .btn-accept {
+            background: #D4AF37;
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 220px;
+        }
+        .btn-accept:hover { background: #b8962e; }
+
+        .btn-decline {
+            background: #fff;
+            color: #999;
+            border: 2px solid #ddd;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 160px;
+        }
+        .btn-decline:hover { background: #f9f9f9; color: #666; }
+
+        .error-card {
+            text-align: center;
+            padding: 60px 32px;
+            color: #888;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="abv-header">
+    <h1>ADORNED BY VEENA</h1>
+</div>
+
+<div class="abv-container">
+    <apex:form>
+
+        <!-- Invalid token / not found -->
+        <apex:outputPanel rendered="{!NOT(showContract)}">
+            <div class="abv-card error-card">
+                <apex:outputText value="{!statusMessage}"/>
+            </div>
+        </apex:outputPanel>
+
+        <!-- Contract content -->
+        <apex:outputPanel rendered="{!showContract}">
+            <div class="abv-card">
+
+                <!-- Status message (signed / declined) -->
+                <apex:outputPanel rendered="{!NOT(ISBLANK(statusMessage))}">
+                    <div class="abv-status">
+                        <apex:outputText value="{!statusMessage}"/>
+                    </div>
+                </apex:outputPanel>
+
+                <!-- Contract HTML -->
+                <div class="contract-content">
+                    <apex:outputText escape="false" value="{!contractHtml}"/>
+                </div>
+
+                <!-- Accept / Decline buttons -->
+                <apex:outputPanel rendered="{!showActions}">
+                    <div class="abv-actions">
+                        <apex:commandButton
+                            value="Accept &amp; Sign Contract"
+                            action="{!accept}"
+                            styleClass="btn-accept"
+                            reRender="mainPanel"/>
+                        <apex:commandButton
+                            value="Decline"
+                            action="{!decline}"
+                            styleClass="btn-decline"
+                            reRender="mainPanel"/>
+                    </div>
+                </apex:outputPanel>
+
+            </div>
+        </apex:outputPanel>
+
+    </apex:form>
+</div>
+
+</body>
+</html>
+</apex:page>

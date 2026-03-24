@@ -3,12 +3,11 @@
     <fullName>Estimated_Guest_Count__c</fullName>
     <externalId>false</externalId>
     <label>Estimated Guest Count</label>
-    <precision>18</precision>
+    <length>100</length>
     <required>false</required>
-    <scale>0</scale>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
-    <type>Number</type>
+    <type>Text</type>
     <unique>false</unique>
 </CustomField>

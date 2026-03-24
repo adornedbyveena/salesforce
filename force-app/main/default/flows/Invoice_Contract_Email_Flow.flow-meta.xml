@@ -122,38 +122,6 @@
         </connector>
     </assignments>
     <assignments>
-        <name>Set_Attachment_ID</name>
-        <label>Set Attachment ID</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>docIdsCollection</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>contentVersionId</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Set_Client_Email</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <name>Set_Client_Email</name>
-        <label>Set Client Email</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>clientEmail</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Email_Input</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Is_Invoice</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
         <name>Assign_LWC_Data</name>
         <label>Assign LWC Data</label>
         <locationX>0</locationX>
@@ -174,22 +142,6 @@
         </assignmentItems>
         <connector>
             <targetReference>Is_Invoice</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <name>Set_Document_Type</name>
-        <label>Set Document Type</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>documentType</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>Document_Type_Select</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Get_Opportunity</targetReference>
         </connector>
     </assignments>
     <assignments>
@@ -238,6 +190,54 @@
             <targetReference>Review_Email</targetReference>
         </connector>
     </assignments>
+    <assignments>
+        <name>Set_Attachment_ID</name>
+        <label>Set Attachment ID</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>docIdsCollection</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>contentVersionId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Set_Client_Email</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Client_Email</name>
+        <label>Set Client Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>clientEmail</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Email_Input</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Is_Invoice</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Document_Type</name>
+        <label>Set Document Type</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>documentType</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Document_Type_Select</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Get_Opportunity</targetReference>
+        </connector>
+    </assignments>
     <choices>
         <name>Choice_Contract</name>
         <choiceText>Contract</choiceText>
@@ -260,6 +260,31 @@
             <stringValue>{&quot;location&quot;:&quot;top&quot;,&quot;type&quot;:&quot;simple&quot;}</stringValue>
         </value>
     </customProperties>
+    <decisions>
+        <name>Apply_Template_Choice</name>
+        <label>Apply Template Choice</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Re_Assign_Contract_Details</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Contract</defaultConnectorLabel>
+        <rules>
+            <name>Invoice_Template_Chosen</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Template_Choice</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Invoice</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Re_Assign_Invoice_Details</targetReference>
+            </connector>
+            <label>Invoice</label>
+        </rules>
+    </decisions>
     <decisions>
         <name>Has_PDF</name>
         <label>Has PDF</label>
@@ -326,31 +351,6 @@
         </rules>
     </decisions>
     <decisions>
-        <name>Type_Already_Set</name>
-        <label>Type Already Set</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <defaultConnector>
-            <targetReference>Select_Document_Type</targetReference>
-        </defaultConnector>
-        <defaultConnectorLabel>Not Set</defaultConnectorLabel>
-        <rules>
-            <name>Type_Is_Set</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>documentType</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Get_Opportunity</targetReference>
-            </connector>
-            <label>Type Is Set</label>
-        </rules>
-    </decisions>
-    <decisions>
         <name>Skip_Confirm_Screens</name>
         <label>Skip Confirm Screens</label>
         <locationX>0</locationX>
@@ -376,28 +376,28 @@
         </rules>
     </decisions>
     <decisions>
-        <name>Apply_Template_Choice</name>
-        <label>Apply Template Choice</label>
+        <name>Type_Already_Set</name>
+        <label>Type Already Set</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
         <defaultConnector>
-            <targetReference>Re_Assign_Contract_Details</targetReference>
+            <targetReference>Select_Document_Type</targetReference>
         </defaultConnector>
-        <defaultConnectorLabel>Contract</defaultConnectorLabel>
+        <defaultConnectorLabel>Not Set</defaultConnectorLabel>
         <rules>
-            <name>Invoice_Template_Chosen</name>
+            <name>Type_Is_Set</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>documentType</leftValueReference>
-                <operator>EqualTo</operator>
+                <operator>IsNull</operator>
                 <rightValue>
-                    <stringValue>Invoice</stringValue>
+                    <booleanValue>false</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Re_Assign_Invoice_Details</targetReference>
+                <targetReference>Get_Opportunity</targetReference>
             </connector>
-            <label>Invoice</label>
+            <label>Type Is Set</label>
         </rules>
     </decisions>
     <environments>Default</environments>
@@ -914,6 +914,27 @@
                 </width>
             </styleProperties>
         </fields>
+        <fields>
+            <name>Template_Choice</name>
+            <choiceReferences>Choice_Contract</choiceReferences>
+            <choiceReferences>Choice_Invoice</choiceReferences>
+            <dataType>String</dataType>
+            <defaultValue>
+                <elementReference>documentType</elementReference>
+            </defaultValue>
+            <fieldText>Email Template</fieldText>
+            <fieldType>RadioButtons</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
         <nextOrFinishButtonLabel>Review Email</nextOrFinishButtonLabel>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
@@ -1014,7 +1035,7 @@
     <textTemplates>
         <name>Contract_Template</name>
         <isViewedAsPlainText>false</isViewedAsPlainText>
-        <text>&lt;p&gt;Hi {!Get_Opportunity.Client_Name_Formula__c},&lt;/p&gt;&lt;p&gt;Thank you for choosing Adorned by Veena! We are so excited to be a part of your upcoming event on &lt;strong&gt;{!Get_Opportunity.CloseDate}&lt;/strong&gt;.&lt;/p&gt;&lt;p&gt;Please find your event planning contract attached to this email. To officially secure your booking, please review and accept the contract by clicking the button below:&lt;/p&gt;&lt;br/&gt;&lt;p style=&quot;text-align:center;&quot;&gt;&lt;a href=&quot;https://adornedbyveena.com/contract/?id={!recordId}&quot; style=&quot;background-color:#D4AF37;color:#020C1D;padding:12px 30px;text-decoration:none;font-weight:bold;font-family:sans-serif;border-radius:4px;display:inline-block;&quot;&gt;Review &amp;amp; Accept Contract&lt;/a&gt;&lt;/p&gt;&lt;br/&gt;&lt;p&gt;&lt;strong&gt;Total Contract Amount: ${!Get_Opportunity.Total_Amount__c}&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;If you have any questions or need adjustments before signing, please don&apos;t hesitate to reach out.&lt;/p&gt;</text>
+        <text>&lt;p&gt;test contract template&lt;/p&gt;</text>
     </textTemplates>
     <textTemplates>
         <name>Invoice_Template</name>

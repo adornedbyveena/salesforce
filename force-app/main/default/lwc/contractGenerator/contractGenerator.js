@@ -1,13 +1,13 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { updateRecord, createRecord, getRecord } from 'lightning/uiRecordApi';
+import { getRecord } from 'lightning/uiRecordApi';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { loadScript } from 'lightning/platformResourceLoader';
 import { CONTRACT_TEMPLATE } from './contractPDFTemplate';
-import PDF_API_KEY from '@salesforce/label/c.PDF_Api_Key';
-
-const PDF_ENDPOINT           = 'https://adornedbyveena.com/api/generate-pdf.php';
-const SAVE_CONTRACT_ENDPOINT = 'https://adornedbyveena.com/api/save-contract.php';
+import HTML2PDF from '@salesforce/resourceUrl/html2pdf';
+import saveContractHtml from '@salesforce/apex/ContractController.saveContractHtml';
+import sendContractEmail from '@salesforce/apex/ContractController.sendContractEmail';
 
 const OPPORTUNITY_FIELDS = [
     'Opportunity.Name',
@@ -26,16 +26,15 @@ export default class ContractGenerator extends LightningElement {
     @track currentStep = '1';
     @track isLoading = true;
     @track pdfUrl;
-    @track flowVariables = [];
 
-    accountId; oppData; rawPdfBase64;
+    accountId; oppData; contractHtml;
     oppSaved = false; accSaved = false;
     oppRecordData = {}; accRecordData = {};
     wiredLineItemsResult;
+    scriptsLoaded = false;
 
     get isStep1() { return this.currentStep === '1'; }
     get isStep2() { return this.currentStep === '2'; }
-    get isStep3() { return this.currentStep === '3'; }
 
     @wire(getRecord, { recordId: '$recordId', fields: OPPORTUNITY_FIELDS })
     wiredOpp({ data, error }) {
@@ -81,13 +80,18 @@ export default class ContractGenerator extends LightningElement {
 
     async generateContractPDF() {
         try {
+            if (!this.scriptsLoaded) {
+                await loadScript(this, HTML2PDF);
+                this.scriptsLoaded = true;
+            }
+
             // --- DATA EXTRACTION ---
             const oppName       = this.oppRecordData.Name?.value              || this.oppData?.fields?.Name?.value              || 'Event';
             const totalAmt      = parseFloat(this.oppRecordData.Total_Amount__c?.value  ?? this.oppData?.fields?.Total_Amount__c?.value  ?? 0).toFixed(2);
             const depAmt        = parseFloat(this.oppRecordData.Deposit__c?.value       ?? this.oppData?.fields?.Deposit__c?.value       ?? 0).toFixed(2);
             const balAmt        = parseFloat(this.oppRecordData.Balance_Due__c?.value   ?? this.oppData?.fields?.Balance_Due__c?.value   ?? 0).toFixed(2);
             const isDepositPaid = this.oppRecordData.Deposit_Paid__c?.value   ?? this.oppData?.fields?.Deposit_Paid__c?.value   ?? false;
-            const eventDateRaw  = this.oppRecordData.CloseDate?.value         || this.oppData?.fields?.CloseDate?.value         || '';
+            const eventDateRaw  = this.oppRecordData.CloseDate?.value      || this.oppData?.fields?.CloseDate?.value      || '';
 
             const billingStreet = this.accRecordData.BillingStreet?.value     || '';
             const billingCity   = this.accRecordData.BillingCity?.value       || '';
@@ -104,7 +108,7 @@ export default class ContractGenerator extends LightningElement {
                 ? new Date(eventDateRaw + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
                 : 'TBD';
 
-            // --- FORMAT ADDRESSES ---
+            // --- FORMAT ADDRESS ---
             const clientAddress = [billingStreet, billingCity, `${billingState} ${billingZip}`.trim()].filter(Boolean).join(', ');
             const venue = clientAddress || 'TBD';
 
@@ -126,8 +130,8 @@ export default class ContractGenerator extends LightningElement {
                 </tr>`;
             }).join('');
 
-            // --- TOKEN REPLACEMENT ---
-            const html = CONTRACT_TEMPLATE
+            // --- BUILD HTML ---
+            this.contractHtml = CONTRACT_TEMPLATE
                 .replace(/{{CREATED_DATE}}/g,   createdDate)
                 .replace(/{{CLIENT_NAME}}/g,    clientName)
                 .replace(/{{CLIENT_ADDRESS}}/g, clientAddress)
@@ -140,38 +144,39 @@ export default class ContractGenerator extends LightningElement {
                 .replace(/{{DEPOSIT_STRING}}/g, depositString)
                 .replace(/{{LINE_ITEMS}}/g,     lineItemsHtml);
 
-            // --- CALL PHP ENDPOINT ---
-            const response = await fetch(PDF_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': PDF_API_KEY
-                },
-                body: JSON.stringify({ html })
-            });
+            // --- SAVE HTML TO SALESFORCE ---
+            await saveContractHtml({ recordId: this.recordId, html: this.contractHtml });
 
-            if (!response.ok) throw new Error(`PDF endpoint error: ${response.status}`);
+            // --- GENERATE PDF IN BROWSER ---
+            const container = this.template.querySelector('.pdf-render-container');
+            // eslint-disable-next-line @lwc/lwc/no-inner-html
+            container.innerHTML = this.contractHtml;
 
-            const { base64 } = await response.json();
-            this.rawPdfBase64 = base64;
-            this.pdfUrl = `data:application/pdf;base64,${base64}`;
+            const pdfDataUri = await window.html2pdf()
+                .set({
+                    margin:      0.5,
+                    filename:    `${oppName} - Contract.pdf`,
+                    image:       { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
+                })
+                .from(container)
+                .outputPdf('datauristring');
 
-            // --- SAVE CONTRACT HTML FOR ACCEPTANCE PAGE ---
-            fetch(SAVE_CONTRACT_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-API-Key': PDF_API_KEY
-                },
-                body: JSON.stringify({ opportunityId: this.recordId, html })
-            }).catch(e => console.error('save-contract error:', e));
+            container.innerHTML = '';
 
+            this.pdfUrl = pdfDataUri;
             this.currentStep = '2';
             this.isLoading = false;
 
         } catch (e) {
             console.error('PDF Generation Error:', e);
             this.isLoading = false;
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Error',
+                message: 'Failed to generate contract PDF. Please try again.',
+                variant: 'error'
+            }));
         }
     }
 
@@ -179,7 +184,6 @@ export default class ContractGenerator extends LightningElement {
         if (this.currentStep === '2') {
             this.currentStep = '1';
             this.pdfUrl = null;
-            this.rawPdfBase64 = null;
         }
     }
 
@@ -188,43 +192,23 @@ export default class ContractGenerator extends LightningElement {
     async saveAndSend() {
         this.isLoading = true;
         try {
-            const dateStr      = new Date().toLocaleDateString('en-CA');
-            const formulaName  = this.oppData?.fields?.Client_Name_Formula__c?.value;
-            const fallbackName = this.accRecordData.Name?.value || this.oppData?.fields?.Account?.value?.fields?.Name?.value || 'Client';
-            const clientName   = formulaName || fallbackName;
-            const finalTitle   = `${clientName} - Contract - ${dateStr}`;
+            await sendContractEmail({ recordId: this.recordId });
 
-            const cvRecord = await createRecord({
-                apiName: 'ContentVersion',
-                fields: {
-                    Title:                  finalTitle,
-                    PathOnClient:           `${finalTitle}.pdf`,
-                    VersionData:            this.rawPdfBase64,
-                    FirstPublishLocationId: this.recordId
-                }
-            });
-
-            await updateRecord({ fields: { Id: this.recordId, StageName: 'Contract Sent' } });
-
-            this.flowVariables = [
-                { name: 'recordId',         type: 'String', value: this.recordId },
-                { name: 'contentVersionId', type: 'String', value: cvRecord.id },
-                { name: 'documentType',     type: 'String', value: 'Contract' }
-            ];
-
-            this.currentStep = '3';
-            this.isLoading = false;
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Contract Sent',
+                message: 'The contract has been sent to the client for signature.',
+                variant: 'success'
+            }));
+            this.closeAction();
 
         } catch (e) {
-            console.error('Save/Send Error:', e);
+            console.error('Send Error:', e);
             this.isLoading = false;
-        }
-    }
-
-    handleFlowStatusChange(event) {
-        if (event.detail.status === 'FINISHED' || event.detail.status === 'FINISHED_SCREEN') {
-            this.dispatchEvent(new ShowToastEvent({ title: 'Success', message: 'Contract sent!', variant: 'success' }));
-            this.closeAction();
+            this.dispatchEvent(new ShowToastEvent({
+                title: 'Error',
+                message: 'Failed to send contract. Please try again.',
+                variant: 'error'
+            }));
         }
     }
 }

@@ -9,28 +9,6 @@
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
-        <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>$1000-$5000</fullName>
-                <default>false</default>
-                <label>$1000-$5000</label>
-            </value>
-            <value>
-                <fullName>$5000-$15000</fullName>
-                <default>false</default>
-                <label>$5000-$15000</label>
-            </value>
-            <value>
-                <fullName>$15000+</fullName>
-                <default>false</default>
-                <label>$15000+</label>
-            </value>
-            <value>
-                <fullName>Custom / Flexible</fullName>
-                <default>false</default>
-                <label>Custom / Flexible</label>
-            </value>
-        </valueSetDefinition>
+        <valueSetName>Estimated_Budget</valueSetName>
     </valueSet>
 </CustomField>

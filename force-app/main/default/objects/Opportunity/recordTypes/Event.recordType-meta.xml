@@ -35,6 +35,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>DeliveryInstallationStatus__c</picklist>
+        <values>
+            <fullName>Completed</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>In progress</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yet to begin</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>Estimated_Budget__c</picklist>
         <values>
             <fullName>%241000-%245000</fullName>
@@ -173,47 +188,23 @@
     <picklistValues>
         <picklist>LeadSource</picklist>
         <values>
-            <fullName>Advertisement</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Employee Referral</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>External Referral</fullName>
-            <default>false</default>
-        </values>
-        <values>
             <fullName>Other</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Partner</fullName>
+            <fullName>Partner Referral</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Public Relations</fullName>
+            <fullName>Phone Inquiry</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Seminar - Internal</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Seminar - Partner</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Trade Show</fullName>
+            <fullName>Purchased List</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Web</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Word of mouth</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -239,11 +230,30 @@
     <picklistValues>
         <picklist>Type</picklist>
         <values>
-            <fullName>Existing Business</fullName>
+            <fullName>Existing Customer - Downgrade</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>New Business</fullName>
+            <fullName>Existing Customer - Replacement</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Existing Customer - Upgrade</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>New Customer</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Venue_Locked__c</picklist>
+        <values>
+            <fullName>No</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Yes</fullName>
             <default>false</default>
         </values>
     </picklistValues>

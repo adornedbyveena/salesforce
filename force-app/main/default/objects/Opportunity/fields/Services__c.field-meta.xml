@@ -9,28 +9,6 @@
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
-        <valueSetDefinition>
-            <sorted>false</sorted>
-            <value>
-                <fullName>Design &amp; Decor</fullName>
-                <default>false</default>
-                <label>Design &amp; Decor</label>
-            </value>
-            <value>
-                <fullName>Decor &amp; Coordination</fullName>
-                <default>false</default>
-                <label>Decor &amp; Coordination</label>
-            </value>
-            <value>
-                <fullName>Full Planning &amp; Coordination</fullName>
-                <default>false</default>
-                <label>Full Planning &amp; Coordination</label>
-            </value>
-            <value>
-                <fullName>I&apos;m not sure</fullName>
-                <default>false</default>
-                <label>I&apos;m not sure</label>
-            </value>
-        </valueSetDefinition>
+        <valueSetName>Services</valueSetName>
     </valueSet>
 </CustomField>

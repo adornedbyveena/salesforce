@@ -1,64 +1,112 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-	<types>
-		<members>PdfGeneratorVF</members>
-		<name>ApexPage</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>AuraDefinitionBundle</name>
-	</types>
-	<types>
-		<members>Account</members>
-		<members>Account</members>
-		<members>Contact</members>
-		<members>ContentDocument</members>
-		<members>Document_Template__c</members>
-		<members>Lead</members>
-		<members>Line_Item__c</members>
-		<members>Opportunity</members>
-		<name>CustomObject</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>FlexiPage</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>Flow</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>FlowDefinition</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>HomePageLayout</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>LightningComponentBundle</name>
-	</types>
-	<types>
-		<members>Event_Pipeline</members>
-		<name>PathAssistant</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>Profile</name>
-	</types>
-	<types>
-		<members>*</members>
-		<name>QuickAction</name>
-	</types>
-	<types>
-		<members>ABVLogo512</members>
-		<members>InvoiceModalStyle</members>
-		<members>SiteSamples</members>
-		<members>html2pdf</members>
-		<members>jsPDF</members>
-		<members>jsPDFAutoTable</members>
-		<name>StaticResource</name>
-	</types>
-	<version>66.0</version>
+
+    <!-- LWC Components -->
+    <types>
+        <members>contractGenerator</members>
+        <members>invoiceGenerator</members>
+        <members>multilineEventLineItems</members>
+        <name>LightningComponentBundle</name>
+    </types>
+
+    <!-- Flows -->
+    <types>
+        <members>Invoice_Contract_Email_Flow</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Invoice_Contract_Email_Flow</members>
+        <name>FlowDefinition</name>
+    </types>
+
+    <!-- Objects (custom + standard with ABV customizations) -->
+    <types>
+        <members>Line_Item__c</members>
+        <members>Account</members>
+        <members>Contact</members>
+        <members>Opportunity</members>
+        <members>Lead</members>
+        <name>CustomObject</name>
+    </types>
+
+    <!-- Static Resources -->
+    <types>
+        <members>ABVLogo512</members>
+        <members>InvoiceModalStyle</members>
+        <members>html2pdf</members>
+        <members>jsPDF</members>
+        <members>jsPDFAutoTable</members>
+        <name>StaticResource</name>
+    </types>
+
+    <!-- Quick Actions -->
+    <types>
+        <members>Opportunity.Generate_Contract</members>
+        <members>Opportunity.Generate_Invoice</members>
+        <members>Opportunity.Add_Line_Items</members>
+        <name>QuickAction</name>
+    </types>
+
+    <!-- Lightning Pages (ABV only) -->
+    <types>
+        <members>Event_Deal</members>
+        <members>Event_Line_Item</members>
+        <members>Perosnal_Client_Record_Page</members>
+        <members>Adorned_By_Veena_UtilityBar</members>
+        <name>FlexiPage</name>
+    </types>
+
+    <!-- Path -->
+    <types>
+        <members>Event_Pipeline</members>
+        <name>PathAssistant</name>
+    </types>
+
+    <!-- Global Picklist Value Sets (must deploy before fields that reference them) -->
+    <types>
+        <members>*</members>
+        <name>GlobalValueSet</name>
+    </types>
+
+    <!-- Apex Pages -->
+    <types>
+        <members>ContractAcceptance</members>
+        <name>ApexPage</name>
+    </types>
+
+    <!-- Apex Classes -->
+    <types>
+        <members>ContractController</members>
+        <members>ContractSiteController</members>
+        <name>ApexClass</name>
+    </types>
+
+    <!-- Custom Label -->
+    <types>
+        <members>PDF_Api_Key</members>
+        <members>Contract_Site_URL</members>
+        <name>CustomLabel</name>
+    </types>
+
+    <!-- Layouts -->
+    <types>
+        <members>Line_Item__c-Event Line Item Layout</members>
+        <members>Opportunity-Event Layout</members>
+        <members>PersonAccount-Person Account Layout</members>
+        <name>Layout</name>
+    </types>
+
+    <!-- Custom App -->
+    <types>
+        <members>Adorned_By_Veena</members>
+        <name>CustomApplication</name>
+    </types>
+
+    <!-- Profiles (Admin only) -->
+    <types>
+        <members>Admin</members>
+        <name>Profile</name>
+    </types>
+
+    <version>66.0</version>
 </Package>
