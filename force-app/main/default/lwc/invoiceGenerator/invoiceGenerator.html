@@ -3,7 +3,7 @@
         <h2 class="slds-text-heading_medium">Adorned by Veena: Invoice Wizard</h2>
     </header>
 
-    <div class="slds-modal__content slds-p-around_medium" style="min-height: 550px; position: relative;">
+    <div class="slds-modal__content slds-p-around_medium" style="position: relative;">
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
         </template>
@@ -19,19 +19,19 @@
                                 <lightning-input-field field-name="Event__c" value={recordId}></lightning-input-field>
                             </div>
                             <div class="slds-grid slds-gutters slds-wrap">
-                                <div class="slds-col slds-size_4-of-12">
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                                     <lightning-input-field field-name="Product__c" required></lightning-input-field>
                                 </div>
-                                <div class="slds-col slds-size_2-of-12">
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_2-of-12">
                                     <lightning-input-field field-name="Quantity__c" required></lightning-input-field>
                                 </div>
-                                <div class="slds-col slds-size_3-of-12">
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_3-of-12">
                                     <lightning-input-field field-name="Sales_Price__c"></lightning-input-field>
                                 </div>
-                                <div class="slds-col slds-size_2-of-12">
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_2-of-12">
                                     <lightning-input-field field-name="Discount__c"></lightning-input-field>
                                 </div>
-                                <div class="slds-col slds-size_1-of-12 slds-p-top_large slds-text-align_right">
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_1-of-12 slds-p-top_large slds-text-align_right">
                                     <lightning-button-icon icon-name="utility:delete" variant="error" data-id={row.id} onclick={removeRow}></lightning-button-icon>
                                 </div>
                                 <div class="slds-col slds-size_1-of-1 slds-m-top_small">
@@ -50,8 +50,8 @@
         <!-- STEP 2: Invoice Details -->
         <template if:true={isStep2}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">2. Invoice Details</div>
-            <div class="slds-grid slds-gutters">
-                <div class="slds-col slds-size_1-of-2">
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                     <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity" data-id="oppForm" onsuccess={handleOppSuccess} onerror={handleFormError}>
                         <div class="slds-box slds-theme_shade">
                             <lightning-input-field field-name="Name"></lightning-input-field>
@@ -59,7 +59,7 @@
                         </div>
                     </lightning-record-edit-form>
                 </div>
-                <div class="slds-col slds-size_1-of-2">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                     <lightning-record-edit-form record-id={accountId} object-api-name="Account" data-id="accForm" onsuccess={handleAccSuccess} onerror={handleFormError}>
                         <div class="slds-box slds-theme_shade">
                             <lightning-input-field field-name="Name"></lightning-input-field>
@@ -89,14 +89,14 @@
                 <template if:true={uploadedImages.length}>
                     <div class="slds-m-top_medium">
                         <template for:each={uploadedImages} for:item="img">
-                            <div key={img.id} class="slds-grid slds-gutters slds-m-bottom_small slds-vertical-align-center slds-box slds-theme_default">
-                                <div class="slds-col slds-size_2-of-12 slds-text-align_center">
+                            <div key={img.id} class="slds-grid slds-gutters slds-wrap slds-m-bottom_small slds-vertical-align-center slds-box slds-theme_default">
+                                <div class="slds-col slds-size_2-of-12 slds-medium-size_2-of-12 slds-text-align_center">
                                     <img src={img.base64} style="max-height: 60px; border-radius: 4px; border: 1px solid #ddd;" />
                                 </div>
-                                <div class="slds-col slds-size_9-of-12">
+                                <div class="slds-col slds-size_8-of-12 slds-medium-size_9-of-12">
                                     <lightning-input type="text" value={img.customName} data-id={img.id} onchange={handleImageRename} label="Image Display Name"></lightning-input>
                                 </div>
-                                <div class="slds-col slds-size_1-of-12 slds-p-top_large">
+                                <div class="slds-col slds-size_2-of-12 slds-medium-size_1-of-12 slds-p-top_large slds-text-align_right">
                                     <lightning-button-icon icon-name="utility:delete" variant="error" data-id={img.id} onclick={removeImage}></lightning-button-icon>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
         <template if:true={isStep5}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">5. Preview &amp; Send Email</div>
 
-            <div style="border:1px solid #ccc; border-radius:8px; overflow:hidden; max-width:640px; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+            <div class="compose-window">
 
                 <!-- Compose header -->
                 <div style="background:#404040; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">

@@ -1,0 +1,41 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.slds-modal__content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.slds-modal__footer {
+    flex: 0 0 auto;
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    z-index: 100;
+}
+
+.compose-window {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 640px;
+    margin: 0 auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 768px) {
+    .slds-modal__content {
+        min-height: 0 !important;
+    }
+
+    .compose-window {
+        max-width: 100%;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+}

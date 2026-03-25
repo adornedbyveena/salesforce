@@ -3,7 +3,7 @@
         <h2 class="slds-text-heading_medium">Adorned by Veena: Contract Wizard</h2>
     </header>
 
-    <div class="slds-modal__content slds-p-around_medium" style="min-height: 550px; position: relative;">
+    <div class="slds-modal__content slds-p-around_medium" style="position: relative;">
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
         </template>
@@ -11,8 +11,8 @@
         <!-- STEP 1: Edit Form -->
         <template if:true={isStep1}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Confirm Event &amp; Client Details</div>
-            <div class="slds-grid slds-gutters">
-                <div class="slds-col slds-size_1-of-2">
+            <div class="slds-grid slds-gutters slds-wrap">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                     <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity" data-id="oppForm" onsuccess={handleOppSuccess} onerror={handleFormError}>
                         <div class="slds-box slds-theme_shade">
                             <lightning-input-field field-name="Name" required></lightning-input-field>
@@ -24,7 +24,7 @@
                         </div>
                     </lightning-record-edit-form>
                 </div>
-                <div class="slds-col slds-size_1-of-2">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                     <template if:true={accountId}>
                         <lightning-record-edit-form record-id={accountId} object-api-name="Account" data-id="accForm" onsuccess={handleAccSuccess} onerror={handleFormError}>
                             <div class="slds-box slds-theme_shade">
@@ -63,7 +63,7 @@
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">3. Preview &amp; Send Email</div>
 
             <!-- Gmail-style compose window -->
-            <div style="border:1px solid #ccc; border-radius:8px; overflow:hidden; max-width:640px; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+            <div class="compose-window">
 
                 <!-- Compose header -->
                 <div style="background:#404040; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
