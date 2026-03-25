@@ -1,150 +1,11 @@
 // Contract PDF HTML template.
-// Tokens are replaced in contractGenerator.js before sending to the PHP endpoint.
+// Only body content — no <html>/<head>/<style> wrapper.
+// CSS lives in ContractAcceptance.page which owns the full document structure.
+// Logo is rendered directly by ContractAcceptance.page (not stored in the HTML field).
 // {{LINE_ITEMS}} is replaced with pre-built <tr> HTML rows.
 
-const CONTRACT_TEMPLATE = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-    @page {
-        margin: .5in;
-        background-color: #F7E7CE;
-    }
-
-    body {
-        font-family: montserrat, sans-serif;
-        font-size: 10pt;
-        color: #020C1D;
-        background-color: #F7E7CE;
-        line-height: 1.5;
-        margin: 0;
-        padding: 0;
-    }
-
-    .header-container {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .header-logo {
-        width: 140px;
-        margin-bottom: 10px;
-    }
-
-    .doc-title {
-        font-size: 22pt;
-        font-weight: bold;
-        color: #020C1D;
-        letter-spacing: 1px;
-    }
-
-    .gold-line {
-        display: block;
-        width: 100%;
-        border-bottom: 2pt solid #D4AF37;
-        margin: 15px 0;
-        font-size: 0;
-        line-height: 0;
-    }
-
-    h2 {
-        font-size: 11pt;
-        font-weight: bold;
-        color: #020C1D;
-        margin: 15px 0 5px 0;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    h3 {
-        font-size: 10pt;
-        font-weight: bold;
-        color: #020C1D;
-        margin: 10px 0 2px 0;
-    }
-
-    p {
-        margin: 5px 0;
-    }
-
-    ul.contract-list {
-        margin: 5px 0 5px 25px;
-        padding: 0;
-    }
-
-    ul.contract-list li {
-        margin-bottom: 5px;
-        padding-left: 5px;
-    }
-
-    .avoid-break {
-        page-break-inside: avoid;
-    }
-
-    .page-break-before {
-        page-break-before: always;
-    }
-
-    .line-items-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 10px 0 15px 0;
-        page-break-inside: auto;
-    }
-
-    .line-items-table tr {
-        page-break-inside: avoid;
-        page-break-after: auto;
-    }
-
-    .line-items-table th {
-        background-color: #D4AF37;
-        color: #020C1D;
-        font-weight: bold;
-        padding: 8px;
-        text-align: left;
-        font-size: 9pt;
-    }
-
-    .line-items-table td {
-        padding: 8px;
-        font-size: 9.5pt;
-        border-bottom: 1px solid #D4AF37;
-        vertical-align: top;
-    }
-
-    .line-name { width: 35%; font-weight: bold; }
-    .line-qty  { width: 10%; text-align: center; }
-    .line-desc { width: 55%; }
-
-    .sig-table {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .sig-block {
-        padding-top: 5px;
-        font-size: 10pt;
-    }
-
-    .payment-note {
-        font-style: italic;
-        color: #555;
-        font-size: 9.5pt;
-        margin-top: 15px;
-        line-height: 1.6;
-    }
-</style>
-</head>
-<body>
-
-<div class="header-container">
-    <img src="logo.png" class="header-logo" />
-    <div class="doc-title">EVENT PLANNING &amp; D&Eacute;COR CONTRACT</div>
-</div>
-
-<p class="gold-line"></p>
+const CONTRACT_TEMPLATE = `
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <h2>Introduction</h2>
 <p>This <strong>Event Planning / Decor Contract Agreement (&quot;Agreement&quot;)</strong> is entered into on <strong>{{CREATED_DATE}}</strong> by and between:</p>
@@ -154,18 +15,18 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
 </ul>
 <p><strong>The parties hereby agree as follows:</strong></p>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <h2>Scope of Services</h2>
 <h3>Event Planning Services</h3>
 <p>The Company agrees to provide the following services for the event hosted by the Client:</p>
 
-<table class="line-items-table">
+<table class="line-items-table" style="width:100%;border-collapse:collapse;margin:10px 0 15px 0;">
     <thead>
         <tr>
-            <th class="line-name">Service / Product</th>
-            <th class="line-qty">Qty</th>
-            <th class="line-desc">Description</th>
+            <th class="line-name" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:35%;">Service / Product</th>
+            <th class="line-qty"  style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:center;font-size:9pt;width:10%;">Qty</th>
+            <th class="line-desc" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:55%;">Description</th>
         </tr>
     </thead>
     <tbody>
@@ -175,9 +36,11 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
 
 <p>These services will be provided in accordance with the terms outlined in this Agreement.</p>
 
-<h3>Exclusions</h3>
-<p>The following services are excluded from this Agreement:</p>
-<ul class="contract-list">
+<div style="page-break-after: always;"></div>
+
+<h3 style="font-style:italic;font-weight:bold;">Exclusions</h3>
+<p style="font-style:italic;font-size:9pt;">The following services are excluded from this Agreement:</p>
+<ul class="contract-list" style="font-style:italic;font-size:9pt;">
     <li>Travel or accommodation costs for The Company or Client unless otherwise specified.</li>
     <li>Insurance for the event (Client will need to secure separate insurance coverage).</li>
     <li>Costs for any services or items not explicitly mentioned in this Agreement.</li>
@@ -192,7 +55,7 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
     </ul>
 </div>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <div class="avoid-break">
     <h2>Compensation and Payment Terms</h2>
@@ -205,14 +68,14 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
         <li><strong>Deposit:</strong> {{DEPOSIT_STRING}}</li>
         <li><strong>Final Payment:</strong> The remaining balance of <strong>\${{BALANCE}}</strong> is due no later than the day of the event.</li>
     </ul>
-    <div class="payment-note">
-        Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.<br/>
-        Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.<br/>
-        Zelle payments should be directed to <strong>adornedbyveena@gmail.com</strong> with the <strong>Inv Ref: {{EVENT_NAME}} - {{EVENT_DATE}}</strong> in the memo.
-    </div>
+    <ul class="contract-list" style="font-style:italic;color:#555;font-size:9.5pt;line-height:1.6;margin-top:15px;">
+        <li>Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.</li>
+        <li>Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.</li>
+        <li><strong>Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: {{EVENT_NAME}} - {{EVENT_DATE}} in the memo.</strong></li>
+    </ul>
 </div>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <h2>Responsibilities of the Parties</h2>
 
@@ -241,7 +104,7 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
     </ul>
 </div>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <div class="avoid-break">
     <h2>Changes and Cancellations</h2>
@@ -261,7 +124,7 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
     <p>This Agreement is governed by the laws of the State of Texas. Any disputes shall be resolved via mandatory mediation in Harris County, Texas, prior to the filing of any lawsuit.</p>
 </div>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <div class="avoid-break">
     <h2>Confidentiality</h2>
@@ -275,6 +138,8 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
         <li>Any disputes arising from this Agreement will be resolved in the courts located in Harris County, Texas.</li>
     </ul>
 </div>
+
+<div style="page-break-before: always;"></div>
 
 <div class="avoid-break">
     <h2>Miscellaneous Provisions</h2>
@@ -293,31 +158,31 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
     <p style="margin: 15px 0 10px 0;">For any inquiries regarding this agreement, please contact <strong>Veena Boppana</strong> at <strong>veena@adornedbyveena.com</strong></p>
 </div>
 
-<p class="gold-line"></p>
+<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>
 
 <div class="avoid-break">
     <h2>Acknowledgement &amp; Acceptance</h2>
     <p>By signing below, the parties acknowledge that they have read, understood, and agree to the terms and conditions outlined in this Agreement.</p>
-    <table class="sig-table">
+    <table class="sig-table" style="width:100%;margin-top:20px;">
         <tr>
-            <td style="width: 45%; vertical-align: top;">
-                <div class="sig-block">
-                    <strong>Adorned by Veena</strong><br/>
-                    Date:
+            <td style="width:45%;vertical-align:bottom;">
+                <div style="border-bottom:1px solid #020C1D;height:50px;"></div>
+                <div style="font-size:10pt;margin-top:4px;">
+                    <strong>Adorned by Veena, LLC</strong><br/>
+                    Date: {{CREATED_DATE}}
                 </div>
             </td>
-            <td style="width: 10%;"></td>
-            <td style="width: 45%; vertical-align: top;">
-                <div class="sig-block">
+            <td style="width:10%;"></td>
+            <td style="width:45%;vertical-align:bottom;text-align:right;">
+                <div style="border-bottom:1px solid #020C1D;height:50px;"></div>
+                <div style="font-size:10pt;margin-top:4px;text-align:right;">
                     <strong>{{CLIENT_NAME}}</strong><br/>
-                    Date:
+                    Date: {{CREATED_DATE}}
                 </div>
             </td>
         </tr>
     </table>
 </div>
-
-</body>
-</html>`;
+`;
 
 export { CONTRACT_TEMPLATE };

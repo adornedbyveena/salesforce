@@ -3,10 +3,9 @@ import { getRecord } from 'lightning/uiRecordApi';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import { loadScript } from 'lightning/platformResourceLoader';
 import { CONTRACT_TEMPLATE } from './contractPDFTemplate';
-import HTML2PDF from '@salesforce/resourceUrl/html2pdf';
 import saveContractHtml from '@salesforce/apex/ContractController.saveContractHtml';
+import generateContractPdf from '@salesforce/apex/ContractController.generateContractPdf';
 import sendContractEmail from '@salesforce/apex/ContractController.sendContractEmail';
 
 const OPPORTUNITY_FIELDS = [
@@ -16,9 +15,9 @@ const OPPORTUNITY_FIELDS = [
     'Opportunity.Balance_Due__c',
     'Opportunity.Deposit_Paid__c',
     'Opportunity.AccountId',
-    'Opportunity.Account.Name',
     'Opportunity.CloseDate',
-    'Opportunity.Client_Name_Formula__c'
+    'Opportunity.Client_Name_Formula__c',
+    'Opportunity.Client_Email__c'
 ];
 
 export default class ContractGenerator extends LightningElement {
@@ -26,15 +25,20 @@ export default class ContractGenerator extends LightningElement {
     @track currentStep = '1';
     @track isLoading = true;
     @track pdfUrl;
+    @track pdfFileName = 'Contract.pdf';
+    @track emailTo = '';
+    @track emailSubject = '';
+    @track emailClientName = '';
+    @track emailEventName = '';
 
     accountId; oppData; contractHtml;
     oppSaved = false; accSaved = false;
     oppRecordData = {}; accRecordData = {};
     wiredLineItemsResult;
-    scriptsLoaded = false;
 
     get isStep1() { return this.currentStep === '1'; }
     get isStep2() { return this.currentStep === '2'; }
+    get isStep3() { return this.currentStep === '3'; }
 
     @wire(getRecord, { recordId: '$recordId', fields: OPPORTUNITY_FIELDS })
     wiredOpp({ data, error }) {
@@ -80,11 +84,6 @@ export default class ContractGenerator extends LightningElement {
 
     async generateContractPDF() {
         try {
-            if (!this.scriptsLoaded) {
-                await loadScript(this, HTML2PDF);
-                this.scriptsLoaded = true;
-            }
-
             // --- DATA EXTRACTION ---
             const oppName       = this.oppRecordData.Name?.value              || this.oppData?.fields?.Name?.value              || 'Event';
             const totalAmt      = parseFloat(this.oppRecordData.Total_Amount__c?.value  ?? this.oppData?.fields?.Total_Amount__c?.value  ?? 0).toFixed(2);
@@ -99,8 +98,11 @@ export default class ContractGenerator extends LightningElement {
             const billingZip    = this.accRecordData.BillingPostalCode?.value || '';
 
             const formulaName = this.oppData?.fields?.Client_Name_Formula__c?.value;
-            const accName     = this.accRecordData.Name?.value || this.oppData?.fields?.Account?.value?.fields?.Name?.value || 'Client';
-            const clientName  = formulaName || accName;
+            const firstName   = this.accRecordData.FirstName?.value || '';
+            const lastName    = this.accRecordData.LastName?.value  || '';
+            const personName  = (firstName + ' ' + lastName).trim();
+            const accName     = this.accRecordData.Name?.value || personName || '';
+            const clientName  = formulaName || accName || 'Client';
 
             // --- FORMAT DATES ---
             const createdDate = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
@@ -124,9 +126,9 @@ export default class ContractGenerator extends LightningElement {
                 const desc = rec.fields.Description__c?.value || '';
                 const qty  = rec.fields.Quantity__c?.value    || '';
                 return `<tr>
-                    <td class="line-name">${name}</td>
-                    <td class="line-qty">${qty}</td>
-                    <td class="line-desc">${desc}</td>
+                    <td class="line-name" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:35%;font-weight:bold;">${name}</td>
+                    <td class="line-qty"  style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:10%;text-align:center;">${qty}</td>
+                    <td class="line-desc" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:55%;">${desc}</td>
                 </tr>`;
             }).join('');
 
@@ -147,45 +149,38 @@ export default class ContractGenerator extends LightningElement {
             // --- SAVE HTML TO SALESFORCE ---
             await saveContractHtml({ recordId: this.recordId, html: this.contractHtml });
 
-            // --- GENERATE PDF IN BROWSER ---
-            const container = this.template.querySelector('.pdf-render-container');
-            // eslint-disable-next-line @lwc/lwc/no-inner-html
-            container.innerHTML = this.contractHtml;
+            // --- GENERATE PDF SERVER-SIDE ---
+            const base64Pdf = await generateContractPdf({ recordId: this.recordId });
+            this.pdfUrl = 'data:application/pdf;base64,' + base64Pdf;
+            this.pdfFileName = `${clientName} - ${createdDate}.pdf`;
 
-            const pdfDataUri = await window.html2pdf()
-                .set({
-                    margin:      0.5,
-                    filename:    `${oppName} - Contract.pdf`,
-                    image:       { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
-                })
-                .from(container)
-                .outputPdf('datauristring');
+            // --- POPULATE EMAIL PREVIEW ---
+            this.emailClientName = clientName;
+            this.emailEventName  = oppName;
+            this.emailTo         = this.oppData?.fields?.Client_Email__c?.value || '';
+            this.emailSubject    = `Your Event Contract - ${oppName}`;
 
-            container.innerHTML = '';
-
-            this.pdfUrl = pdfDataUri;
             this.currentStep = '2';
             this.isLoading = false;
 
         } catch (e) {
-            console.error('PDF Generation Error:', e);
+            const msg = e?.body?.message || e?.message || JSON.stringify(e);
+            console.error('PDF Generation Error:', msg);
             this.isLoading = false;
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Error',
-                message: 'Failed to generate contract PDF. Please try again.',
+                message: msg,
                 variant: 'error'
             }));
         }
     }
 
     goBack() {
-        if (this.currentStep === '2') {
-            this.currentStep = '1';
-            this.pdfUrl = null;
-        }
+        if (this.currentStep === '3') { this.currentStep = '2'; }
+        else if (this.currentStep === '2') { this.currentStep = '1'; this.pdfUrl = null; }
     }
+
+    previewEmail() { this.currentStep = '3'; }
 
     closeAction() { this.dispatchEvent(new CloseActionScreenEvent()); }
 

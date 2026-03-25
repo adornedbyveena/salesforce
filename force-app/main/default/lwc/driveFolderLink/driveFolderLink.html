@@ -1,0 +1,22 @@
+<template>
+    <lightning-card title="Google Drive Folder" icon-name="utility:connected_apps">
+        <div class="slds-p-around_medium">
+            <template if:true={folderUrl}>
+                <div class="slds-media slds-media_center">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="doctype:gdrive" size="medium"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">Contracts &amp; Invoices</p>
+                        <a href={folderUrl} target="_blank" rel="noopener noreferrer" class="slds-text-link">
+                            Open Folder in Google Drive
+                        </a>
+                    </div>
+                </div>
+            </template>
+            <template if:false={folderUrl}>
+                <p class="slds-text-color_weak slds-text-body_small">No Drive folder yet. Generate a contract or invoice to create one.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

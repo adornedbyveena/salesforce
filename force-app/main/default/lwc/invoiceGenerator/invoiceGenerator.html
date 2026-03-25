@@ -8,6 +8,7 @@
             <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
         </template>
 
+        <!-- STEP 1: Line Items -->
         <template if:true={isStep1}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Service Line Items</div>
             <div class="slds-scrollable_y" style="max-height: 420px;">
@@ -46,6 +47,7 @@
             </div>
         </template>
 
+        <!-- STEP 2: Invoice Details -->
         <template if:true={isStep2}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">2. Invoice Details</div>
             <div class="slds-grid slds-gutters">
@@ -73,17 +75,17 @@
             </div>
         </template>
 
+        <!-- STEP 3: Reference Pictures -->
         <template if:true={isStep3}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">3. Reference Pictures</div>
             <div class="slds-box slds-theme_shade">
-                <lightning-input 
-                    type="file" 
-                    label="Upload Design References" 
-                    accept=".jpg, .jpeg, .png, .gif, .tiff, .tif, .webp, .avif, .svg, .eps" 
-                    multiple 
+                <lightning-input
+                    type="file"
+                    label="Upload Design References"
+                    accept=".jpg, .jpeg, .png, .gif, .tiff, .tif, .webp, .avif, .svg, .eps"
+                    multiple
                     onchange={handleFileChange}>
                 </lightning-input>
-                
                 <template if:true={uploadedImages.length}>
                     <div class="slds-m-top_medium">
                         <template for:each={uploadedImages} for:item="img">
@@ -104,11 +106,13 @@
             </div>
         </template>
 
+        <!-- STEP 4: PDF Preview -->
         <template if:true={isStep4}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">4. Review Invoice PDF</div>
             <div class="slds-box slds-theme_shade slds-text-align_center slds-m-top_large slds-p-around_xx-large">
                 <lightning-icon icon-name="doctype:pdf" size="large"></lightning-icon>
-                <h3 class="slds-text-heading_medium slds-m-top_medium">Document Generated</h3>
-                <p class="slds-m-bottom_large slds-text-color_weak">Click below to open the preview in a secure tab.</p>
+                <h3 class="slds-text-heading_medium slds-m-top_medium">Invoice Generated</h3>
+                <p class="slds-m-bottom_large slds-text-color_weak">Review the invoice before sending it to the client.</p>
                 <a href={pdfUrl} target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                     <button class="slds-button slds-button_outline-brand slds-p-horizontal_medium slds-p-vertical_x-small">
                         <lightning-icon icon-name="utility:preview" size="x-small" class="slds-m-right_x-small"></lightning-icon>
@@ -118,37 +122,84 @@
             </div>
         </template>
 
+        <!-- STEP 5: Email Compose Preview -->
         <template if:true={isStep5}>
-            <div class="slds-box slds-theme_shade">
-                <lightning-flow 
-                    flow-api-name="Invoice_Contract_Email_Flow" 
-                    flow-input-variables={flowVariables}
-                    onstatuschange={handleFlowStatusChange}>
-                </lightning-flow>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">5. Preview &amp; Send Email</div>
+
+            <div style="border:1px solid #ccc; border-radius:8px; overflow:hidden; max-width:640px; margin:0 auto; box-shadow:0 4px 16px rgba(0,0,0,0.15);">
+
+                <!-- Compose header -->
+                <div style="background:#404040; padding:10px 16px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:#fff; font-size:14px; font-weight:500;">New Message</span>
+                    <lightning-icon icon-name="utility:minimize_window" size="x-small" style="--sds-c-icon-color-foreground-default:#fff;"></lightning-icon>
+                </div>
+
+                <!-- Fields -->
+                <div style="background:#fff; border-bottom:1px solid #e0e0e0; padding:0 12px;">
+                    <div style="display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #e0e0e0;">
+                        <span style="color:#666; font-size:13px; width:60px; flex-shrink:0;">From</span>
+                        <span style="font-size:13px; color:#222;">Adorned by Veena &lt;adornedbyveena@gmail.com&gt;</span>
+                    </div>
+                    <div style="display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #e0e0e0;">
+                        <span style="color:#666; font-size:13px; width:60px; flex-shrink:0;">To</span>
+                        <span style="font-size:13px; color:#222; background:#e8f0fe; border-radius:16px; padding:2px 10px;">{emailTo}</span>
+                    </div>
+                    <div style="display:flex; align-items:center; padding:8px 0;">
+                        <span style="color:#666; font-size:13px; width:60px; flex-shrink:0;">Subject</span>
+                        <span style="font-size:13px; color:#222;">{emailSubject}</span>
+                    </div>
+                </div>
+
+                <!-- Email body preview -->
+                <div style="background:#fff; padding:16px 16px 8px 16px; font-family:Arial,sans-serif; font-size:13px; color:#222; min-height:200px; line-height:1.6;">
+                    <p>Dear {emailClientName},</p>
+                    <p>Please find your invoice for <strong>{emailEventName}</strong> attached to this email.</p>
+                    <p>Payment can be sent via Zelle to <strong>adornedbyveena@gmail.com</strong> with the invoice reference in the memo.</p>
+                    <p>If you have any questions please contact us at <span style="color:#1a73e8;">veena@adornedbyveena.com</span>.</p>
+                    <p>Warm regards,<br/><strong>Veena Boppana</strong><br/>Principal Designer, Adorned By Veena</p>
+                </div>
+
+                <!-- Attachment -->
+                <div style="background:#fff; padding:8px 16px 12px; border-top:1px solid #e0e0e0;">
+                    <div style="display:inline-flex; align-items:center; background:#f1f3f4; border-radius:4px; padding:6px 10px; gap:6px;">
+                        <lightning-icon icon-name="doctype:pdf" size="x-small"></lightning-icon>
+                        <span style="font-size:12px; color:#444;">{pdfFileName}</span>
+                    </div>
+                </div>
+
+                <!-- Compose footer -->
+                <div style="background:#fff; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e0e0e0;">
+                    <lightning-button
+                        variant="brand"
+                        label="Send"
+                        icon-name="utility:send"
+                        icon-position="left"
+                        onclick={saveAndSend}>
+                    </lightning-button>
+                    <lightning-icon icon-name="utility:delete" size="small" style="cursor:pointer; color:#666;" onclick={closeAction}></lightning-icon>
+                </div>
             </div>
         </template>
     </div>
 
-    <template if:false={isStep5}>
-        <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
-            <div>
-                <lightning-button label="Cancel" onclick={closeAction} if:true={isStep1}></lightning-button>
-                <lightning-button label="Back" onclick={goBack} if:false={isStep1}></lightning-button>
-            </div>
-            <div>
-                <template if:true={isStep1}>
-                    <lightning-button label="Next: Edit Details" variant="brand" onclick={saveStep1}></lightning-button>
-                </template>
-                <template if:true={isStep2}>
-                    <lightning-button label="Next: Reference Images" variant="brand" onclick={saveStep2}></lightning-button>
-                </template>
-                <template if:true={isStep3}>
-                    <lightning-button label="Next: Generate PDF" variant="brand" onclick={saveStep3}></lightning-button>
-                </template>
-                <template if:true={isStep4}>
-                    <lightning-button label="Next: Prepare Email" variant="brand" onclick={saveAndSend}></lightning-button>
-                </template>
-            </div>
-        </footer>
-    </template>
+    <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
+        <div>
+            <lightning-button label="Cancel" onclick={closeAction} if:true={isStep1}></lightning-button>
+            <lightning-button label="Back" onclick={goBack} if:false={isStep1}></lightning-button>
+        </div>
+        <div>
+            <template if:true={isStep1}>
+                <lightning-button label="Next: Edit Details" variant="brand" onclick={saveStep1}></lightning-button>
+            </template>
+            <template if:true={isStep2}>
+                <lightning-button label="Next: Reference Images" variant="brand" onclick={saveStep2}></lightning-button>
+            </template>
+            <template if:true={isStep3}>
+                <lightning-button label="Next: Generate PDF" variant="brand" onclick={saveStep3}></lightning-button>
+            </template>
+            <template if:true={isStep4}>
+                <lightning-button label="Next: Preview Email" variant="brand" onclick={previewEmail}></lightning-button>
+            </template>
+        </div>
+    </footer>
 </template>

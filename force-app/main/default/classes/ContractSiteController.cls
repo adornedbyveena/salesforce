@@ -6,8 +6,10 @@ public without sharing class ContractSiteController {
     public String  statusMessage { get; private set; }
     public Boolean showContract  { get; private set; }
     public Boolean showActions   { get; private set; }
+    public Boolean isPdfMode     { get; private set; }
 
     private String opportunityId;
+    private String contractToken;
 
     public ContractSiteController() {
         showContract = false;
@@ -35,6 +37,7 @@ public without sharing class ContractSiteController {
 
         Opportunity opp = opps[0];
         opportunityId = opp.Id;
+        contractToken = token;
         contractHtml  = opp.Contract_HTML__c;
         eventName     = opp.Name;
         clientName    = String.isNotBlank(opp.Client_Name_Formula__c)
@@ -42,9 +45,20 @@ public without sharing class ContractSiteController {
                         : opp.Account.Name;
         showContract  = true;
 
-        if (opp.Contract_Status__c == 'Signed') {
-            statusMessage = 'This contract has already been signed. Thank you!';
-            showActions   = false;
+        isPdfMode = ApexPages.currentPage().getParameters().get('pdf') == 'true';
+        String msg = ApexPages.currentPage().getParameters().get('msg');
+
+        if (msg == 'signed') {
+            statusMessage = 'Thank you! Your contract has been signed. We look forward to working with you!';
+            showActions = false;
+        } else if (msg == 'declined') {
+            statusMessage = 'Your contract has been declined. We will be in touch shortly.';
+            showActions = false;
+        } else if (isPdfMode || opp.Contract_Status__c == 'Signed') {
+            if (opp.Contract_Status__c == 'Signed') {
+                statusMessage = 'This contract has already been signed. Thank you!';
+            }
+            showActions = false;
         } else if (opp.Contract_Status__c == 'Declined') {
             statusMessage = 'This contract has been declined.';
             showActions   = false;
@@ -54,30 +68,22 @@ public without sharing class ContractSiteController {
     }
 
     public PageReference accept() {
-        if (String.isBlank(opportunityId)) return null;
-
-        update new Opportunity(
-            Id = opportunityId,
-            Contract_Status__c = 'Signed',
-            Contract_Signed_Date_Time__c = DateTime.now(),
-            StageName = 'Closed Won'
-        );
-
-        showActions   = false;
-        statusMessage = 'Thank you! Your contract has been signed. We look forward to working with you!';
-        return null;
+        if (String.isBlank(contractToken)) return null;
+        EventBus.publish(new Contract_Action__e(Token__c = contractToken, Action__c = 'Accept'));
+        PageReference pr = Page.ContractAcceptance;
+        pr.getParameters().put('token', contractToken);
+        pr.getParameters().put('msg', 'signed');
+        pr.setRedirect(true);
+        return pr;
     }
 
     public PageReference decline() {
-        if (String.isBlank(opportunityId)) return null;
-
-        update new Opportunity(
-            Id = opportunityId,
-            Contract_Status__c = 'Declined'
-        );
-
-        showActions   = false;
-        statusMessage = 'Your contract has been declined. We will be in touch shortly.';
-        return null;
+        if (String.isBlank(contractToken)) return null;
+        EventBus.publish(new Contract_Action__e(Token__c = contractToken, Action__c = 'Decline'));
+        PageReference pr = Page.ContractAcceptance;
+        pr.getParameters().put('token', contractToken);
+        pr.getParameters().put('msg', 'declined');
+        pr.setRedirect(true);
+        return pr;
     }
 }

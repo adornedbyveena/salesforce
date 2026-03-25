@@ -2,41 +2,68 @@ public with sharing class ContractController {
 
     @AuraEnabled
     public static void saveContractHtml(String recordId, String html) {
+        String token = EncodingUtil.convertToHex(Crypto.generateAesKey(128));
         update new Opportunity(
             Id = recordId,
             Contract_HTML__c = html,
+            Contract_Token__c = token,
             Contract_Status__c = 'Draft'
         );
     }
 
     @AuraEnabled
+    public static String generateContractPdf(String recordId) {
+        // Token was already saved (and committed) by saveContractHtml — just read it
+        Opportunity opp = [SELECT Contract_Token__c FROM Opportunity WHERE Id = :recordId LIMIT 1];
+        String token = opp.Contract_Token__c;
+
+        PageReference pdfPage = Page.ContractAcceptance;
+        pdfPage.getParameters().put('token', token);
+        pdfPage.getParameters().put('pdf', 'true');
+        Blob pdfBlob = Test.isRunningTest()
+            ? Blob.valueOf('test')
+            : pdfPage.getContentAsPDF();
+        return EncodingUtil.base64Encode(pdfBlob);
+    }
+
+    @AuraEnabled
     public static void sendContractEmail(String recordId) {
         Opportunity opp = [
-            SELECT Id, Name, Client_Email__c, Client_Name_Formula__c, Account.Name
+            SELECT Id, Name, CloseDate, Client_Email__c, Client_Name_Formula__c, Account.Name, Contract_Token__c
             FROM Opportunity
             WHERE Id = :recordId
             LIMIT 1
         ];
 
-        String token = EncodingUtil.convertToHex(Crypto.generateAesKey(128));
-        String acceptanceUrl = System.Label.Contract_Site_URL + '?token=' + token;
+        String token       = opp.Contract_Token__c;
+        String clientName  = String.isNotBlank(opp.Client_Name_Formula__c)
+                             ? opp.Client_Name_Formula__c : opp.Account.Name;
+        String contractUrl = System.Label.Contract_Site_URL + '?token=' + token;
 
-        String clientName = String.isNotBlank(opp.Client_Name_Formula__c)
-            ? opp.Client_Name_Formula__c
-            : opp.Account.Name;
+        // 1 — Re-generate PDF blob (callout)
+        PageReference pdfPage = Page.ContractAcceptance;
+        pdfPage.getParameters().put('token', token);
+        pdfPage.getParameters().put('pdf', 'true');
+        Blob pdfBlob = Test.isRunningTest()
+            ? Blob.valueOf('test')
+            : pdfPage.getContentAsPDF();
 
-        Messaging.SingleEmailMessage email = new Messaging.SingleEmailMessage();
-        email.setToAddresses(new List<String>{ opp.Client_Email__c });
-        email.setSubject('Your Contract from Adorned By Veena \u2013 ' + opp.Name);
-        email.setHtmlBody(buildEmailBody(clientName, opp.Name, acceptanceUrl));
-        Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ email });
+        // 2 — Upload to Google Drive: ABV Contracts and Invoices / <Client Name> - <Event Date> /
+        String eventDate  = opp.CloseDate != null ? opp.CloseDate.format() : '';
+        String folderName = clientName + (String.isNotBlank(eventDate) ? ' - ' + eventDate : '');
+        String fileName   = clientName + ' - Contract - ' + Date.today().format() + '.pdf';
+        String folderUrl  = GoogleDriveService.uploadContract(folderName, fileName, pdfBlob);
 
+        // 3 — Send via Gmail
+        GoogleGmailService.sendContractEmail(opp.Client_Email__c, clientName, opp.Name, contractUrl);
+
+        // 4 — Update Opportunity status (DML must be last — after all callouts)
         update new Opportunity(
-            Id = recordId,
-            Contract_Token__c = token,
-            Contract_Status__c = 'Sent',
+            Id                   = recordId,
+            Contract_Status__c   = 'Sent',
             Contract_Sent_Date__c = Date.today(),
-            StageName = 'Contract Sent'
+            StageName            = 'Contract Sent',
+            Drive_Folder_URL__c  = folderUrl
         );
     }
 

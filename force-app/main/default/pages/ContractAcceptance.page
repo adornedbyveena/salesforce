@@ -1,152 +1,155 @@
-<apex:page controller="ContractSiteController" showHeader="false" standardStylesheets="false" sidebar="false" docType="html-5.0">
+﻿<apex:page controller="ContractSiteController" showHeader="false" standardStylesheets="false" sidebar="false" docType="html-5.0">
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Contract – Adorned By Veena</title>
     <style>
+
+        /* ── Reset ── */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
 
-        .abv-header {
-            background: #D4AF37;
-            padding: 20px 32px;
-            text-align: center;
-        }
-        .abv-header h1 {
-            color: #fff;
-            font-size: 22px;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
+        /* ── Page ── */
+        @page { margin: .5in; }
+        html { height: 100%; background-color: #F7E7CE; }
+        body { height: 100%; font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #020C1D; line-height: 1.5; background-color: #F7E7CE; }
 
-        .abv-container {
-            max-width: 900px;
-            margin: 32px auto;
-            padding: 0 16px 64px;
-        }
+        /* Belt-and-suspenders: also set on the wrapper div */
+        .page-bg { background-color: #F7E7CE; min-height: 100%; }
 
-        .abv-card {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            padding: 48px;
-        }
+        /* ── Site header (browser only — hidden in PDF via rendered=) ── */
+        .abv-header { background: #D4AF37; padding: 20px 32px; text-align: center; }
+        .abv-header h1 { color: #fff; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+
+        .abv-container { max-width: 900px; margin: 8px auto; padding: 0 16px 32px; }
+
+        /* No box-shadow or border-radius — not supported by Flying Saucer */
+        .abv-card { background-color: #F7E7CE; padding: 32px 48px; }
 
         .abv-status {
             text-align: center;
             padding: 20px 0 28px;
             font-size: 17px;
             color: #555;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #c9a96e;
             margin-bottom: 28px;
         }
-
-        .abv-status.success { color: #2e7d32; font-weight: bold; font-size: 18px; border: none; }
+        .abv-status.success  { color: #2e7d32; font-weight: bold; font-size: 18px; border: none; }
         .abv-status.declined { color: #c62828; border: none; }
 
-        .contract-content {
-            margin-bottom: 8px;
-        }
+        .error-card { text-align: center; padding: 60px 32px; color: #888; font-size: 18px; }
 
-        .abv-actions {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            margin-top: 40px;
-            padding-top: 32px;
-            border-top: 2px solid #f0e6c0;
-            flex-wrap: wrap;
-        }
-
+        /* flex not supported — use text-align + inline-block */
+        .abv-actions { text-align: center; margin-top: 40px; padding-top: 32px; border-top: 2px solid #c9a96e; }
         .btn-accept {
-            background: #D4AF37;
-            color: #fff;
-            border: none;
-            padding: 14px 40px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 220px;
+            display: inline-block;
+            background: #D4AF37; color: #fff; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: bold;
+            cursor: pointer; min-width: 220px; margin: 4px;
         }
         .btn-accept:hover { background: #b8962e; }
-
         .btn-decline {
-            background: #fff;
-            color: #999;
-            border: 2px solid #ddd;
-            padding: 14px 40px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            min-width: 160px;
+            display: inline-block;
+            background: #fff; color: #999; border: 2px solid #ddd;
+            padding: 14px 40px; font-size: 16px; font-weight: bold;
+            cursor: pointer; min-width: 160px; margin: 4px;
         }
         .btn-decline:hover { background: #f9f9f9; color: #666; }
 
-        .error-card {
-            text-align: center;
-            padding: 60px 32px;
-            color: #888;
-            font-size: 18px;
-        }
+        /* ── Contract document styles ── */
+        .header-container { text-align: center; margin-bottom: 25px; }
+        .header-logo      { height: 160px; width: auto; margin-bottom: 10px; }
+        .doc-title        { font-size: 18pt; font-weight: bold; color: #020C1D; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; }
+
+        .gold-line { display: block; width: 100%; border-bottom: 2pt solid #D4AF37; margin: 15px 0; font-size: 0; line-height: 0; }
+
+        h2 { font-size: 8pt; font-weight: bold; color: #020C1D; margin: 15px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        h3 { font-size: 8pt; font-weight: bold; color: #020C1D; margin: 10px 0 2px 0; }
+        p  { margin: 5px 0; }
+
+        ul.contract-list    { margin: 5px 0 5px 25px; padding: 0; }
+        ul.contract-list li { margin-bottom: 5px; padding-left: 5px; }
+
+        .avoid-break       { page-break-inside: avoid; }
+        .page-break-before { page-break-before: always; }
+
+        .line-items-table { width: 100%; border-collapse: collapse; margin: 10px 0 15px 0; page-break-inside: auto; }
+        .line-items-table tr { page-break-inside: avoid; page-break-after: auto; }
+        .line-items-table th { background-color: #D4AF37; color: #020C1D; font-weight: bold; padding: 8px; text-align: left; font-size: 9pt; }
+        .line-items-table td { padding: 8px; font-size: 9.5pt; border-bottom: 1px solid #D4AF37; vertical-align: top; }
+        .line-name { width: 35%; font-weight: bold; }
+        .line-qty  { width: 10%; text-align: center; }
+        .line-desc { width: 55%; }
+
+        .sig-table { width: 100%; margin-top: 20px; }
+        .sig-block { padding-top: 5px; font-size: 10pt; }
+
+        .payment-note { font-style: italic; color: #555; font-size: 9.5pt; margin-top: 15px; line-height: 1.6; }
     </style>
 </head>
 <body>
+<div class="page-bg">
 
-<div class="abv-header">
-    <h1>ADORNED BY VEENA</h1>
-</div>
+    <!-- Site header — hidden in PDF mode via server-side rendering condition -->
+    <apex:outputPanel rendered="{!NOT(isPdfMode)}">
+        <div class="abv-header">
+            <h1>ADORNED BY VEENA</h1>
+        </div>
+    </apex:outputPanel>
 
-<div class="abv-container">
-    <apex:form>
+    <div class="abv-container">
+        <apex:form>
 
-        <!-- Invalid token / not found -->
-        <apex:outputPanel rendered="{!NOT(showContract)}">
-            <div class="abv-card error-card">
-                <apex:outputText value="{!statusMessage}"/>
-            </div>
-        </apex:outputPanel>
-
-        <!-- Contract content -->
-        <apex:outputPanel rendered="{!showContract}">
-            <div class="abv-card">
-
-                <!-- Status message (signed / declined) -->
-                <apex:outputPanel rendered="{!NOT(ISBLANK(statusMessage))}">
-                    <div class="abv-status">
-                        <apex:outputText value="{!statusMessage}"/>
-                    </div>
-                </apex:outputPanel>
-
-                <!-- Contract HTML -->
-                <div class="contract-content">
-                    <apex:outputText escape="false" value="{!contractHtml}"/>
+            <!-- Invalid token / not found -->
+            <apex:outputPanel rendered="{!NOT(showContract)}">
+                <div class="abv-card error-card">
+                    <apex:outputText value="{!statusMessage}"/>
                 </div>
+            </apex:outputPanel>
 
-                <!-- Accept / Decline buttons -->
-                <apex:outputPanel rendered="{!showActions}">
-                    <div class="abv-actions">
-                        <apex:commandButton
-                            value="Accept &amp; Sign Contract"
-                            action="{!accept}"
-                            styleClass="btn-accept"
-                            reRender="mainPanel"/>
-                        <apex:commandButton
-                            value="Decline"
-                            action="{!decline}"
-                            styleClass="btn-decline"
-                            reRender="mainPanel"/>
+            <!-- Contract content -->
+            <apex:outputPanel rendered="{!showContract}">
+                <div class="abv-card">
+
+                    <!-- Status message (signed / declined) -->
+                    <apex:outputPanel rendered="{!NOT(ISBLANK(statusMessage))}">
+                        <div class="abv-status">
+                            <apex:outputText value="{!statusMessage}"/>
+                        </div>
+                    </apex:outputPanel>
+
+                    <!-- Document header (logo + title) — table-based centering for Flying Saucer -->
+                    <table style="width:100%;margin-bottom:20px;"><tr><td style="text-align:center;padding:0;">
+                        <apex:image url="{!URLFOR($Resource.ABVLogo512)}" style="height:80px;width:auto;" alt="Adorned By Veena"/>
+                        <div class="doc-title" style="font-size:18pt;font-weight:bold;color:#020C1D;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-top:6px;">EVENT PLANNING &amp; D&Eacute;COR CONTRACT</div>
+                    </td></tr></table>
+
+                    <!-- Contract HTML body content -->
+                    <div class="contract-content">
+                        <apex:outputText escape="false" value="{!contractHtml}"/>
                     </div>
-                </apex:outputPanel>
 
-            </div>
-        </apex:outputPanel>
+                    <!-- Accept / Decline buttons (hidden in PDF mode) -->
+                    <apex:outputPanel rendered="{!showActions}">
+                        <div class="abv-actions">
+                            <apex:commandButton
+                                value="Accept and Sign Contract"
+                                action="{!accept}"
+                                styleClass="btn-accept"/>
+                            <apex:commandButton
+                                value="Decline"
+                                action="{!decline}"
+                                styleClass="btn-decline"/>
+                        </div>
+                    </apex:outputPanel>
 
-    </apex:form>
+                </div>
+            </apex:outputPanel>
+
+        </apex:form>
+    </div>
+
 </div>
-
 </body>
 </html>
 </apex:page>
