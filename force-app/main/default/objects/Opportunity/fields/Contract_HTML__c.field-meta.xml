@@ -3,7 +3,6 @@
     <fullName>Contract_HTML__c</fullName>
     <label>Contract HTML</label>
     <length>131072</length>
-    <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>

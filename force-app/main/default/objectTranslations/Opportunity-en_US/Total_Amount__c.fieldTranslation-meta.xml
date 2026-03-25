@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- The system-calculated total based on all Line Item prices. To adjust this number, add, edit, or remove records in the Line Items related list --></help>
+    <label><!-- Total Amount --></label>
+    <name>Total_Amount__c</name>
+</CustomFieldTranslation>

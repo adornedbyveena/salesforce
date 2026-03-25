@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Date when the setup of the event needs to take place --></help>
+    <label><!-- Setup Date --></label>
+    <name>Setup_Date__c</name>
+</CustomFieldTranslation>

@@ -98,7 +98,7 @@
     </apex:outputPanel>
 
     <div class="abv-container">
-        <apex:form>
+        <apex:form >
 
             <!-- Invalid token / not found -->
             <apex:outputPanel rendered="{!NOT(showContract)}">
@@ -132,12 +132,10 @@
                     <!-- Accept / Decline buttons (hidden in PDF mode) -->
                     <apex:outputPanel rendered="{!showActions}">
                         <div class="abv-actions">
-                            <apex:commandButton
-                                value="Accept and Sign Contract"
+                            <apex:commandButton value="Accept and Sign Contract"
                                 action="{!accept}"
                                 styleClass="btn-accept"/>
-                            <apex:commandButton
-                                value="Decline"
+                            <apex:commandButton value="Decline"
                                 action="{!decline}"
                                 styleClass="btn-decline"/>
                         </div>

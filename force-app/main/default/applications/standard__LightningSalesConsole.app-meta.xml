@@ -16,14 +16,11 @@
     <tabs>standard-Campaign</tabs>
     <tabs>standard-Task</tabs>
     <tabs>standard-Event</tabs>
-    <tabs>standard-ContentNote</tabs>
     <tabs>standard-report</tabs>
     <tabs>standard-Dashboard</tabs>
     <tabs>standard-Feed</tabs>
     <tabs>standard-CollaborationGroup</tabs>
     <tabs>standard-File</tabs>
-    <tabs>standard-EmailTemplate</tabs>
-    <tabs>standard-UserDefinedLabel</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>LightningSalesConsole_UtilityBar</utilityBar>
     <workspaceConfig>
@@ -40,13 +37,7 @@
             <tab>standard-Contact</tab>
         </mappings>
         <mappings>
-            <tab>standard-ContentNote</tab>
-        </mappings>
-        <mappings>
             <tab>standard-Dashboard</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-EmailTemplate</tab>
         </mappings>
         <mappings>
             <tab>standard-Event</tab>
@@ -65,9 +56,6 @@
         </mappings>
         <mappings>
             <tab>standard-Task</tab>
-        </mappings>
-        <mappings>
-            <tab>standard-UserDefinedLabel</tab>
         </mappings>
         <mappings>
             <tab>standard-home</tab>

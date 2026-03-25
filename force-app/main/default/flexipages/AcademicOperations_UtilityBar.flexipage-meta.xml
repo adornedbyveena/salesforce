@@ -4,6 +4,12 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentName>opencti:softPhone</componentName>
+                <identifier>opencti_softphone</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
                 <componentName>notes:utilityBarNoteList</componentName>
                 <identifier>notes_utilityBarNoteList</identifier>
             </componentInstance>

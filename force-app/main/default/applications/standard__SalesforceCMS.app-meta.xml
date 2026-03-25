@@ -8,9 +8,9 @@
     <label>Salesforce CMS</label>
     <navType>Console</navType>
     <tabs>standard-CmsAuthorHome</tabs>
+    <tabs>standard-CmsChannel</tabs>
     <tabs>standard-CmsWorkspaces</tabs>
     <tabs>standard-CmsExperiences</tabs>
-    <tabs>standard-CmsChannel</tabs>
     <uiType>Lightning</uiType>
     <workspaceConfig>
         <mappings>
