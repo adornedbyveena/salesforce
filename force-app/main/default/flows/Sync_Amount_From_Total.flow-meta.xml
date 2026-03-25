@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <assignments>
+        <name>Set_Amount</name>
+        <label>Set Amount</label>
+        <locationX>176</locationX>
+        <locationY>278</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Amount</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.Total_Amount__c</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Before-save flow that copies Total_Amount__c (roll-up summary) to the standard Amount field so native reports, forecasting, and dashboards stay accurate.</description>
+    <interviewLabel>Sync Amount From Total {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Sync Amount From Total</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Set_Amount</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
