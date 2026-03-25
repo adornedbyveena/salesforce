@@ -85,6 +85,76 @@
         .sig-block { padding-top: 5px; font-size: 10pt; }
 
         .payment-note { font-style: italic; color: #555; font-size: 9.5pt; margin-top: 15px; line-height: 1.6; }
+
+        /* ── Electronic Signature Section ── */
+        .esig-section {
+            background: #fdf8ef;
+            border: 2px solid #D4AF37;
+            padding: 28px 32px;
+            margin-top: 32px;
+        }
+        .esig-title {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #020C1D;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .esig-desc {
+            font-size: 9.5pt;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .esig-field-label {
+            display: block;
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 6px;
+            color: #020C1D;
+        }
+        .esig-input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 14pt;
+            font-family: Georgia, serif;
+            font-style: italic;
+            border: 1px solid #c9a96e;
+            background: #fff;
+            color: #020C1D;
+            margin-bottom: 18px;
+        }
+        .esig-input:focus { outline: 2px solid #D4AF37; }
+        .esig-consent {
+            display: table;
+            margin-bottom: 14px;
+        }
+        .esig-consent input[type="checkbox"] {
+            display: table-cell;
+            vertical-align: top;
+            margin-top: 3px;
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .esig-consent label {
+            display: table-cell;
+            font-size: 9.5pt;
+            color: #333;
+            cursor: pointer;
+            line-height: 1.5;
+        }
+        .esig-error {
+            background: #fdecea;
+            border: 1px solid #e57373;
+            color: #c62828;
+            padding: 10px 14px;
+            font-size: 9.5pt;
+            margin-bottom: 14px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -129,12 +199,47 @@
                         <apex:outputText escape="false" value="{!contractHtml}"/>
                     </div>
 
-                    <!-- Accept / Decline buttons (hidden in PDF mode) -->
+                    <!-- Electronic Signature + Buttons (hidden in PDF mode) -->
                     <apex:outputPanel rendered="{!showActions}">
+
+                        <!-- Apex server-side error (e.g. name blank on submit) -->
+                        <apex:messages styleClass="esig-error" style="display:block;"/>
+
+                        <div class="esig-section">
+                            <div class="esig-title">Electronic Signature</div>
+                            <p class="esig-desc">
+                                By typing your full legal name below and clicking
+                                <strong>"Accept and Sign Contract"</strong>, you agree that your
+                                electronic signature is the legal equivalent of your handwritten
+                                signature on this contract, and that this agreement is legally binding.
+                            </p>
+
+                            <label class="esig-field-label" for="{!$Component.sigNameInput}">
+                                Full Legal Name *
+                            </label>
+                            <apex:inputText id="sigNameInput"
+                                value="{!signedName}"
+                                styleClass="esig-input"
+                                html-placeholder="Type your full legal name"/>
+
+                            <div class="esig-consent">
+                                <input type="checkbox" id="esigConsent"/>
+                                <label for="esigConsent">
+                                    I agree to conduct business electronically and confirm that
+                                    this electronic signature is legally binding.
+                                </label>
+                            </div>
+
+                            <div id="esigError" class="esig-error">
+                                Please enter your full legal name and check the consent box to sign.
+                            </div>
+                        </div>
+
                         <div class="abv-actions">
                             <apex:commandButton value="Accept and Sign Contract"
                                 action="{!accept}"
-                                styleClass="btn-accept"/>
+                                styleClass="btn-accept"
+                                onclick="return validateEsig();"/>
                             <apex:commandButton value="Decline"
                                 action="{!decline}"
                                 styleClass="btn-decline"/>
@@ -148,6 +253,23 @@
     </div>
 
 </div>
+
+<script>
+function validateEsig() {
+    var nameInput = document.querySelector('input[id$="sigNameInput"]');
+    var consent   = document.getElementById('esigConsent');
+    var errDiv    = document.getElementById('esigError');
+
+    if (!nameInput || !nameInput.value.trim() || !consent || !consent.checked) {
+        if (errDiv) errDiv.style.display = 'block';
+        if (nameInput && !nameInput.value.trim()) nameInput.focus();
+        return false;
+    }
+    if (errDiv) errDiv.style.display = 'none';
+    return true;
+}
+</script>
+
 </body>
 </html>
 </apex:page>

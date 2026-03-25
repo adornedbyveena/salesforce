@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity.Contract_Signed_Name__c</members>
+        <members>Opportunity.Contract_Signer_IP__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>GoogleGmailService</members>
+        <members>ContractSiteController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>ContractAcceptance</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>CEO</members>
+        <name>Profile</name>
+    </types>
+    <version>62.0</version>
+</Package>

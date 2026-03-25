@@ -88,6 +88,46 @@ public class GoogleGmailService {
         }
     }
 
+    public static void sendContractSignedConfirmation(String toEmail, String clientName, String eventName, String signedName, DateTime signedAt) {
+        String subject  = 'Contract Signed – ' + eventName;
+        String htmlBody = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">'
+            + '<div style="background:#D4AF37;padding:24px;text-align:center;">'
+            + '<h2 style="color:#fff;margin:0;letter-spacing:2px;">ADORNED BY VEENA</h2>'
+            + '</div>'
+            + '<div style="padding:32px;background:#fff;">'
+            + '<p>Dear ' + clientName + ',</p>'
+            + '<p>Thank you! Your Event Planning &amp; D&eacute;cor Contract for <strong>' + eventName + '</strong> has been signed and is now legally binding.</p>'
+            + '<table style="width:100%;border-collapse:collapse;margin:24px 0;background:#f9f6f0;">'
+            + '<tr><td style="padding:12px 16px;font-weight:bold;width:40%;">Signed by:</td><td style="padding:12px 16px;">' + signedName + '</td></tr>'
+            + '<tr><td style="padding:12px 16px;font-weight:bold;border-top:1px solid #e8d9c0;">Date &amp; Time:</td><td style="padding:12px 16px;border-top:1px solid #e8d9c0;">' + signedAt.format('MMMM d, yyyy \'at\' h:mm a z') + '</td></tr>'
+            + '</table>'
+            + '<p>We are excited to bring your vision to life! We will be in touch with next steps.</p>'
+            + '<p>If you have any questions please contact us at <a href="mailto:veena@adornedbyveena.com">veena@adornedbyveena.com</a>.</p>'
+            + '<p>Warm regards,<br/><strong>Veena Boppana</strong><br/>Principal Designer, Adorned By Veena</p>'
+            + '</div></div>';
+
+        String rawEmail = 'To: ' + toEmail + '\r\n'
+            + 'Subject: ' + subject + '\r\n'
+            + 'MIME-Version: 1.0\r\n'
+            + 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
+            + htmlBody;
+
+        String b64 = EncodingUtil.base64Encode(Blob.valueOf(rawEmail));
+        b64 = b64.replace('+', '-').replace('/', '_').replace('=', '');
+
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(NC + '/gmail/v1/users/me/messages/send');
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/json');
+        req.setBody('{"raw":"' + b64 + '"}');
+        req.setTimeout(120000);
+
+        HttpResponse res = new Http().send(req);
+        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
+            throw new CalloutException('Gmail signed confirmation failed (' + res.getStatusCode() + '): ' + res.getBody());
+        }
+    }
+
     static String buildEmailBody(String clientName, String eventName, String contractUrl) {
         return '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">'
             + '<div style="background:#D4AF37;padding:24px;text-align:center;">'
