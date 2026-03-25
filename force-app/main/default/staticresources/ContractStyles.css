@@ -1,0 +1,120 @@
+/* ── Reset ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Page / Body ── */
+@page { margin: .5in; }
+html, body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    color: #020C1D;
+    background-color: #F7E7CE;
+    line-height: 1.5;
+}
+
+/* ── Site header (browser view only) ── */
+.abv-header {
+    background: #D4AF37;
+    padding: 20px 32px;
+    text-align: center;
+}
+.abv-header h1 { color: #fff; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+
+.abv-container { max-width: 900px; margin: 32px auto; padding: 0 16px 64px; }
+
+.abv-card {
+    background: #F7E7CE;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 48px;
+}
+
+.abv-status {
+    text-align: center;
+    padding: 20px 0 28px;
+    font-size: 17px;
+    color: #555;
+    border-bottom: 1px solid #c9a96e;
+    margin-bottom: 28px;
+}
+.abv-status.success  { color: #2e7d32; font-weight: bold; font-size: 18px; border: none; }
+.abv-status.declined { color: #c62828; border: none; }
+
+.error-card { text-align: center; padding: 60px 32px; color: #888; font-size: 18px; }
+
+.abv-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 40px;
+    padding-top: 32px;
+    border-top: 2px solid #c9a96e;
+    flex-wrap: wrap;
+}
+.btn-accept {
+    background: #D4AF37; color: #fff; border: none;
+    padding: 14px 40px; font-size: 16px; font-weight: bold;
+    border-radius: 4px; cursor: pointer; min-width: 220px;
+}
+.btn-accept:hover { background: #b8962e; }
+.btn-decline {
+    background: #fff; color: #999; border: 2px solid #ddd;
+    padding: 14px 40px; font-size: 16px; font-weight: bold;
+    border-radius: 4px; cursor: pointer; min-width: 160px;
+}
+.btn-decline:hover { background: #f9f9f9; color: #666; }
+
+/* ── Contract document styles ── */
+.header-container { text-align: center; margin-bottom: 25px; }
+.header-logo      { width: 140px; margin-bottom: 10px; }
+.doc-title        { font-size: 22pt; font-weight: bold; color: #020C1D; letter-spacing: 1px; }
+
+.gold-line {
+    display: block; width: 100%;
+    border-bottom: 2pt solid #D4AF37;
+    margin: 15px 0; font-size: 0; line-height: 0;
+}
+
+h2 {
+    font-size: 11pt; font-weight: bold; color: #020C1D;
+    margin: 15px 0 5px 0; text-transform: uppercase; letter-spacing: 1px;
+}
+h3   { font-size: 10pt; font-weight: bold; color: #020C1D; margin: 10px 0 2px 0; }
+p    { margin: 5px 0; }
+
+ul.contract-list    { margin: 5px 0 5px 25px; padding: 0; }
+ul.contract-list li { margin-bottom: 5px; padding-left: 5px; }
+
+.avoid-break       { page-break-inside: avoid; }
+.page-break-before { page-break-before: always; }
+
+.line-items-table {
+    width: 100%; border-collapse: collapse;
+    margin: 10px 0 15px 0; page-break-inside: auto;
+}
+.line-items-table tr { page-break-inside: avoid; page-break-after: auto; }
+.line-items-table th {
+    background-color: #D4AF37; color: #020C1D;
+    font-weight: bold; padding: 8px; text-align: left; font-size: 9pt;
+}
+.line-items-table td {
+    padding: 8px; font-size: 9.5pt;
+    border-bottom: 1px solid #D4AF37; vertical-align: top;
+}
+.line-name { width: 35%; font-weight: bold; }
+.line-qty  { width: 10%; text-align: center; }
+.line-desc { width: 55%; }
+
+.sig-table { width: 100%; margin-top: 20px; }
+.sig-block { padding-top: 5px; font-size: 10pt; }
+
+.payment-note {
+    font-style: italic; color: #555; font-size: 9.5pt;
+    margin-top: 15px; line-height: 1.6;
+}
+
+/* ── Hide site chrome when printing / PDF ── */
+@media print {
+    .abv-header, .abv-actions { display: none !important; }
+    .abv-card       { box-shadow: none; padding: 0; }
+    .abv-container  { margin: 0; padding: 0; max-width: 100%; }
+}

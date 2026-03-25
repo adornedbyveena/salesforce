@@ -6,18 +6,27 @@ public class GoogleGmailService {
         String toEmail,
         String clientName,
         String eventName,
-        String contractUrl
+        String contractUrl,
+        String pdfBase64,
+        String fileName
     ) {
-        String subject = 'Your Event Contract - ' + eventName;
+        String boundary = 'ABV_BOUNDARY_' + String.valueOf(DateTime.now().getTime());
+        String subject  = 'Your Event Contract - ' + eventName;
 
-        // Build RFC 2822 message
         String rawEmail = 'To: ' + toEmail + '\r\n'
             + 'Subject: ' + subject + '\r\n'
             + 'MIME-Version: 1.0\r\n'
+            + 'Content-Type: multipart/mixed; boundary="' + boundary + '"\r\n\r\n'
+            + '--' + boundary + '\r\n'
             + 'Content-Type: text/html; charset=UTF-8\r\n\r\n'
-            + buildEmailBody(clientName, eventName, contractUrl);
+            + buildEmailBody(clientName, eventName, contractUrl) + '\r\n\r\n'
+            + '--' + boundary + '\r\n'
+            + 'Content-Type: application/pdf\r\n'
+            + 'Content-Transfer-Encoding: base64\r\n'
+            + 'Content-Disposition: attachment; filename="' + fileName + '"\r\n\r\n'
+            + pdfBase64 + '\r\n\r\n'
+            + '--' + boundary + '--';
 
-        // Base64url encode (Gmail API requirement)
         String b64 = EncodingUtil.base64Encode(Blob.valueOf(rawEmail));
         b64 = b64.replace('+', '-').replace('/', '_').replace('=', '');
 
@@ -26,6 +35,7 @@ public class GoogleGmailService {
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
         req.setBody('{"raw":"' + b64 + '"}');
+        req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
         if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
