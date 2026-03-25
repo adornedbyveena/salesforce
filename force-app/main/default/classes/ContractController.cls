@@ -26,11 +26,16 @@ public with sharing class ContractController {
         // 1 — Upload to Google Drive
         String folderUrl = GoogleDriveService.uploadContract(folderName, fileName, pdfBlob);
 
-        // 2 — Send via Gmail (PDF attached + signing link in body)
+        // 2 — Send via Gmail (catch so Drive URL is always saved even if email fails)
         String pdfBase64ForEmail = Test.isRunningTest() ? '' : EncodingUtil.base64Encode(pdfBlob);
-        GoogleGmailService.sendContractEmail(opp.Client_Email__c, clientName, opp.Name, contractUrl, pdfBase64ForEmail, fileName);
+        String emailError = null;
+        try {
+            GoogleGmailService.sendContractEmail(opp.Client_Email__c, clientName, opp.Name, contractUrl, pdfBase64ForEmail, fileName);
+        } catch (Exception e) {
+            emailError = e.getMessage();
+        }
 
-        // 3 — DML last (after all callouts)
+        // 3 — DML always runs after all callouts
         update new Opportunity(
             Id                    = recordId,
             Contract_Token__c     = token,
@@ -39,5 +44,10 @@ public with sharing class ContractController {
             StageName             = 'Contract Sent',
             Drive_Folder_URL__c   = folderUrl
         );
+
+        // Surface email failure after DML is committed
+        if (emailError != null) {
+            throw new AuraHandledException('Contract saved to Drive but email failed: ' + emailError);
+        }
     }
 }

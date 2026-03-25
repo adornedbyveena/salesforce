@@ -19,15 +19,25 @@ public with sharing class InvoiceController {
         // 1 — Upload PDF to Google Drive
         String folderUrl = GoogleDriveService.uploadContract(folderName, fileName, pdfBlob);
 
-        // 2 — Send email via Gmail with PDF attached
-        GoogleGmailService.sendInvoiceEmail(opp.Client_Email__c, clientName, opp.Name, pdfBase64, fileName);
+        // 2 — Send email via Gmail (catch so Drive URL is always saved even if email fails)
+        String emailError = null;
+        try {
+            GoogleGmailService.sendInvoiceEmail(opp.Client_Email__c, clientName, opp.Name, pdfBase64, fileName);
+        } catch (Exception e) {
+            emailError = e.getMessage();
+        }
 
-        // 3 — DML last (after all callouts)
+        // 3 — DML always runs after all callouts
         update new Opportunity(
             Id                   = recordId,
             Invoice_Status__c    = 'Sent',
             Invoice_Sent_Date__c = Date.today(),
             Drive_Folder_URL__c  = folderUrl
         );
+
+        // Surface email failure after DML is committed
+        if (emailError != null) {
+            throw new AuraHandledException('Invoice saved to Drive but email failed: ' + emailError);
+        }
     }
 }
