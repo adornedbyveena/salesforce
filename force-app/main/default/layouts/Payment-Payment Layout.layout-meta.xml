@@ -101,10 +101,6 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>OrderPaymentSummaryId</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
                 <field>CancellationEffectiveDate</field>
             </layoutItems>
         </layoutColumns>

@@ -8,6 +8,10 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Readonly</behavior>
+                <field>CreditMemoNumber</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
                 <field>DocumentNumber</field>
             </layoutItems>
             <layoutItems>
@@ -26,12 +30,12 @@
                 <behavior>Edit</behavior>
                 <field>BillToContactId</field>
             </layoutItems>
+        </layoutColumns>
+        <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>CreditDate</field>
             </layoutItems>
-        </layoutColumns>
-        <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>Status</field>
@@ -64,18 +68,6 @@
             <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>TotalAmountWithTax</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>TotalCreditAmountApplied</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>TotalCreditAmountUnapplied</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Readonly</behavior>
-                <field>NetCreditsApplied</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns/>
@@ -115,26 +107,6 @@
         <layoutColumns/>
         <style>CustomLinks</style>
     </layoutSections>
-    <relatedLists>
-        <fields>Name</fields>
-        <fields>Type</fields>
-        <fields>RelatedLine</fields>
-        <fields>LineAmount</fields>
-        <relatedList>CreditMemoLines</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>Name</fields>
-        <fields>Amount</fields>
-        <fields>Type</fields>
-        <fields>AppliedDate</fields>
-        <fields>UnappliedDate</fields>
-        <relatedList>CreditMemoInvApplications</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>Name</fields>
-        <fields>Status</fields>
-        <relatedList>AsyncOperationTrackerRecords</relatedList>
-    </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>

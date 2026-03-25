@@ -78,7 +78,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>AppliedDate</field>
+                <field>UnappliedDate</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -88,11 +88,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>EffectiveDate</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>UnappliedDate</field>
+                <field>AppliedDate</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>

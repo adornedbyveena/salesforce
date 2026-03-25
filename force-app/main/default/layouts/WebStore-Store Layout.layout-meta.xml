@@ -29,19 +29,11 @@
                 <behavior>Required</behavior>
                 <field>SupportedLanguages</field>
             </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>SupportedShipToCountries</field>
-            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
                 <behavior>Required</behavior>
                 <field>DefaultLanguage</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
-                <field>Country</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>
@@ -81,13 +73,6 @@
     <relatedLists>
         <fields>ProductCatalog</fields>
         <relatedList>WebStoreCatalogs</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>Pricebook2</fields>
-        <fields>IsActive</fields>
-        <fields>PRICEBOOK_VALID_FROM</fields>
-        <fields>PRICEBOOK_VALID_TO</fields>
-        <relatedList>WebStorePricebooks</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>

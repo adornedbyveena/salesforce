@@ -123,12 +123,6 @@
         <fields>IsPersonalPhone</fields>
         <relatedList>ContactPointPhones</relatedList>
     </relatedLists>
-    <relatedLists>
-        <fields>Name</fields>
-        <fields>ContactPointType</fields>
-        <fields>PrivacyConsentStatus</fields>
-        <relatedList>ContactPointTypeConsents</relatedList>
-    </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showRunAssignmentRulesCheckbox>false</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
