@@ -11,7 +11,7 @@
         <!-- STEP 1: Line Items -->
         <template if:true={isStep1}>
             <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Service Line Items</div>
-            <div class="slds-scrollable_y" style="max-height: 420px;">
+            <div>
                 <template for:each={rows} for:item="row">
                     <div key={row.id} class="slds-box slds-m-bottom_medium slds-theme_shade slds-is-relative">
                         <lightning-record-edit-form object-api-name="Line_Item__c" record-id={row.recordId} onsuccess={handleLineItemSuccess}>
@@ -173,8 +173,8 @@
 
     <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
         <div>
-            <lightning-button label="Cancel" onclick={closeAction} if:true={isStep1}></lightning-button>
-            <lightning-button label="Back" onclick={goBack} if:false={isStep1}></lightning-button>
+            <lightning-button label="Cancel" onclick={closeAction}></lightning-button>
+            <lightning-button label="Back" onclick={goBack} if:false={isStep1} class="slds-m-left_x-small"></lightning-button>
         </div>
         <div>
             <template if:true={isStep1}>

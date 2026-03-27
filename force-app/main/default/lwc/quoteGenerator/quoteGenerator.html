@@ -145,10 +145,8 @@
 
     <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
         <div>
-            <lightning-button label="Cancel" onclick={closeAction} if:true={isStep1}></lightning-button>
-            <lightning-button label="Back"   onclick={goBack}      if:true={isStep2}></lightning-button>
-            <lightning-button label="Back"   onclick={goBack}      if:true={isStep3}></lightning-button>
-            <lightning-button label="Back"   onclick={goBack}      if:true={isStep4}></lightning-button>
+            <lightning-button label="Cancel" onclick={closeAction}></lightning-button>
+            <lightning-button label="Back"   onclick={goBack} if:false={isStep1} class="slds-m-left_x-small"></lightning-button>
         </div>
         <div>
             <template if:true={isStep1}>
