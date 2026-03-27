@@ -11,6 +11,16 @@
     <custom>true</custom>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Lead.Event_Description__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Venue__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.Client_Email__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -48,6 +58,11 @@
         <editable>true</editable>
         <field>Opportunity.Quote_Status__c</field>
         <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.Venue__c</field>
+        <readable>false</readable>
     </fieldPermissions>
     <pageAccesses>
         <apexPage>QuoteAcceptance</apexPage>

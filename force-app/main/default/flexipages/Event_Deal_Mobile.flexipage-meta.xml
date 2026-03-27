@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
-
-    <!-- ═══════════════════════════════════════════
-         HEADER: Highlights panel + path assistant
-    ═══════════════════════════════════════════ -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -14,10 +10,10 @@
                             <value>Opportunity.Add_Line_Items</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Opportunity.Generate_Contract</value>
+                            <value>Opportunity.Contract</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Opportunity.Generate_Invoice</value>
+                            <value>Opportunity.Invoice</value>
                         </valueListItems>
                         <valueListItems>
                             <value>FeedItem.ContentNote</value>
@@ -65,15 +61,64 @@
                 <identifier>mob_pathAssistant</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>actionNames</name>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>maxRecordsToDisplay</name>
+                    <value>5</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>parentFieldApiName</name>
+                    <value>Opportunity.Id</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListApiName</name>
+                    <value>Line_Items__r</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListDisplayType</name>
+                    <value>ADVGRID</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListFieldAliases</name>
+                    <valueList>
+                        <valueListItems>
+                            <value>Product__c</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Sales_Price__c</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Quantity__c</value>
+                        </valueListItems>
+                    </valueList>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListLabel</name>
+                    <value>Line Items</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showActionBar</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>sortFieldAlias</name>
+                    <value>__DEFAULT__</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>sortFieldOrder</name>
+                    <value>Default</value>
+                </componentInstanceProperties>
+                <componentName>lst:dynamicRelatedList</componentName>
+                <identifier>mob_lineItems_relatedList</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>header</name>
         <type>Region</type>
     </flexiPageRegions>
-
-    <!-- ═══════════════════════════════════════════
-         FACETS: Field groups (single column each)
-    ═══════════════════════════════════════════ -->
-
-    <!-- Event Details fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -112,7 +157,7 @@
                     <value>none</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.Venue__c</fieldItem>
-                <identifier>mob_VenueField</identifier>
+                <identifier>RecordVenue__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -162,8 +207,6 @@
         <name>Facet-mob-event-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- Dates & Logistics fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -222,8 +265,6 @@
         <name>Facet-mob-dates-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- Financials fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -292,8 +333,6 @@
         <name>Facet-mob-financials-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- Contract fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -362,8 +401,6 @@
         <name>Facet-mob-contract-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- Invoice fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -412,10 +449,6 @@
         <name>Facet-mob-invoice-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- ═══════════════════════════════════════════
-         MAIN REGION: Stacked single-column layout
-    ═══════════════════════════════════════════ -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -510,61 +543,6 @@
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
-                    <name>actionNames</name>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>maxRecordsToDisplay</name>
-                    <value>5</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>parentFieldApiName</name>
-                    <value>Opportunity.Id</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListApiName</name>
-                    <value>Line_Items__r</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListDisplayType</name>
-                    <value>ADVGRID</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListFieldAliases</name>
-                    <valueList>
-                        <valueListItems>
-                            <value>Product__c</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>Sales_Price__c</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>Quantity__c</value>
-                        </valueListItems>
-                    </valueList>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListLabel</name>
-                    <value>Line Items</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>showActionBar</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>sortFieldAlias</name>
-                    <value>__DEFAULT__</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>sortFieldOrder</name>
-                    <value>Default</value>
-                </componentInstanceProperties>
-                <componentName>lst:dynamicRelatedList</componentName>
-                <identifier>mob_lineItems_relatedList</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
                     <name>showLegacyActivityComposer</name>
                     <value>false</value>
                 </componentInstanceProperties>
@@ -575,11 +553,32 @@
         <name>main</name>
         <type>Region</type>
     </flexiPageRegions>
-
+    <flexiPageRegions>
+        <name>sidebar</name>
+        <type>Region</type>
+    </flexiPageRegions>
     <masterLabel>Event Deal Mobile</masterLabel>
     <sobjectType>Opportunity</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
+        <properties>
+            <name>actionNames</name>
+            <valueList>
+                <valueListItems>
+                    <value>Opportunity.Add_Line_Items</value>
+                </valueListItems>
+                <valueListItems>
+                    <value>Opportunity.Contract</value>
+                </valueListItems>
+                <valueListItems>
+                    <value>Opportunity.Invoice</value>
+                </valueListItems>
+            </valueList>
+        </properties>
+        <properties>
+            <name>enablePageActionConfig</name>
+            <value>true</value>
+        </properties>
     </template>
     <type>RecordPage</type>
 </FlexiPage>

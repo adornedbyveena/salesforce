@@ -7,19 +7,25 @@
                     <name>actionNames</name>
                     <valueList>
                         <valueListItems>
-                            <value>FeedItem.ContentNote</value>
+                            <value>Opportunity.Add_Line_Items</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Opportunity.Add_Line_Items</value>
+                            <value>Opportunity.Contract</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Opportunity.Invoice</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Opportunity.Quote</value>
+                        </valueListItems>
+                        <valueListItems>
+                            <value>Edit</value>
                         </valueListItems>
                         <valueListItems>
                             <value>Delete</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Opportunity.Generate_Contract</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>Opportunity.Generate_Invoice</value>
+                            <value>Clone</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -101,16 +107,6 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Venue__c</fieldItem>
-                <identifier>RecordVenue__cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
                 <fieldItem>Record.Client_Email__c</fieldItem>
                 <identifier>RecordClient_Email__cField</identifier>
             </fieldInstance>
@@ -121,8 +117,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.Event_Description__c</fieldItem>
-                <identifier>RecordEvent_Description__cField</identifier>
+                <fieldItem>Record.Venue__c</fieldItem>
+                <identifier>RecordVenue__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-b78f7bac-0a71-4404-bdfe-7a72d92b231c</name>
@@ -412,6 +408,78 @@
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Contract_Signed_Name__c</fieldItem>
+                <identifier>RecordContract_Signed_Name_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Contract_Signer_IP__c</fieldItem>
+                <identifier>RecordContract_Signer_IP_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-6acd4a37-013d-4361-91f2-d0d45e898ba3</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Drive_Folder_URL__c</fieldItem>
+                <identifier>RecordDrive_Folder_URL_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.Contract_HTML__c</fieldItem>
+                <identifier>RecordContract_HTML_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-4425f759-428c-4a1f-b30f-bab651f54fb4</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-6acd4a37-013d-4361-91f2-d0d45e898ba3</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>flexipage_column7</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-4425f759-428c-4a1f-b30f-bab651f54fb4</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>flexipage_column8</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-77927b62-5c59-4ece-ae4f-13c73d5f552e</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>columns</name>
@@ -462,6 +530,31 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection3</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-77927b62-5c59-4ece-ae4f-13c73d5f552e</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Additional</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>flexipage_fieldSection4</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!$User.Profile.Name}</leftValue>
+                        <operator>CONTAINS</operator>
+                        <rightValue>System Administrator</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <name>Facet-cdc73c79-8be3-4274-adcf-2567c5cdbe5e</name>
@@ -516,6 +609,10 @@
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Tabs</value>
+                </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>tabs</name>
                     <value>Facet-5d0218c3-ed66-460e-be41-d93c9ec9a43a</value>
@@ -584,6 +681,12 @@
                 </componentInstanceProperties>
                 <componentName>lst:dynamicRelatedList</componentName>
                 <identifier>lst_dynamicRelatedList</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>driveFolderLink</componentName>
+                <identifier>c_driveFolderLink</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

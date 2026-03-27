@@ -10,6 +10,11 @@
     </classAccesses>
     <custom>true</custom>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.Venue__c</field>
+        <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.Client_Email__c</field>
         <readable>true</readable>
@@ -81,6 +86,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Opportunity.Venue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Line_Item__c.Description__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -99,11 +109,13 @@
         <field>Line_Item__c.Quantity__c</field>
         <readable>true</readable>
     </fieldPermissions>
-
     <pageAccesses>
         <apexPage>QuoteAcceptance</apexPage>
         <enabled>true</enabled>
     </pageAccesses>
+    <layoutAssignments>
+        <layout>Opportunity-Event Layout</layout>
+    </layoutAssignments>
     <userLicense>Salesforce</userLicense>
     <userPermissions>
         <enabled>true</enabled>
