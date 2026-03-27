@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>When a Web-to-Lead record is created, auto-creates a Person Account (or finds existing by email) and an Opportunity with all event details, then deletes the Lead to save storage.</description>
+    <interviewLabel>Lead Auto Convert {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Lead Auto Convert</label>
+    <processType>AutoLaunchedFlow</processType>
+    <status>Active</status>
+
+    <!-- ═══════════════ START ═══════════════ -->
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>lookupPersonAccount</targetReference>
+        </connector>
+        <filterLogic>1</filterLogic>
+        <filters>
+            <field>LeadSource</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Web</stringValue>
+            </value>
+        </filters>
+        <object>Lead</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+
+    <!-- ═══════════════ VARIABLES ═══════════════ -->
+    <variables>
+        <name>varAccountId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+
+    <!-- ═══════════════ FORMULAS ═══════════════ -->
+    <formulas>
+        <name>formulaOppName</name>
+        <dataType>String</dataType>
+        <expression>IF(NOT(ISBLANK({!$Record.Event_Name__c})), {!$Record.Event_Name__c}, {!$Record.FirstName} &amp; " " &amp; {!$Record.LastName} &amp; " - Event")</expression>
+    </formulas>
+    <formulas>
+        <name>formulaCloseDate</name>
+        <dataType>Date</dataType>
+        <expression>IF(NOT(ISBLANK({!$Record.Event_Date__c})), {!$Record.Event_Date__c}, TODAY() + 365)</expression>
+    </formulas>
+
+    <!-- ═══════════════ ASSIGNMENTS ═══════════════ -->
+    <assignments>
+        <name>assignExistingAccountId</name>
+        <label>Set Existing Account ID</label>
+        <locationX>440</locationX>
+        <locationY>360</locationY>
+        <assignmentItems>
+            <assignToReference>varAccountId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>lookupPersonAccount.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>createOpportunity</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>assignNewAccountId</name>
+        <label>Set New Account ID</label>
+        <locationX>176</locationX>
+        <locationY>600</locationY>
+        <assignmentItems>
+            <assignToReference>varAccountId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>createPersonAccount</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>createOpportunity</targetReference>
+        </connector>
+    </assignments>
+
+    <!-- ═══════════════ DECISIONS ═══════════════ -->
+    <decisions>
+        <name>decisionAccountExists</name>
+        <label>Account Already Exists?</label>
+        <locationX>176</locationX>
+        <locationY>240</locationY>
+        <defaultConnector>
+            <targetReference>lookupPersonAccountRT</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No — Create New</defaultConnectorLabel>
+        <rules>
+            <name>ruleAccountFound</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>lookupPersonAccount.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>assignExistingAccountId</targetReference>
+            </connector>
+            <label>Yes — Use Existing</label>
+        </rules>
+    </decisions>
+
+    <!-- ═══════════════ RECORD LOOKUPS ═══════════════ -->
+    <recordLookups>
+        <name>lookupPersonAccount</name>
+        <label>Find Existing Person Account</label>
+        <locationX>176</locationX>
+        <locationY>120</locationY>
+        <connector>
+            <targetReference>decisionAccountExists</targetReference>
+        </connector>
+        <filterLogic>1 AND 2</filterLogic>
+        <filters>
+            <field>PersonEmail</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Email</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsPersonAccount</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>lookupPersonAccountRT</name>
+        <label>Get Person Account Record Type</label>
+        <locationX>176</locationX>
+        <locationY>360</locationY>
+        <connector>
+            <targetReference>createPersonAccount</targetReference>
+        </connector>
+        <filterLogic>1 AND 2</filterLogic>
+        <filters>
+            <field>SObjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Account</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>IsPersonType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+
+    <!-- ═══════════════ RECORD CREATES ═══════════════ -->
+    <recordCreates>
+        <name>createPersonAccount</name>
+        <label>Create Person Account</label>
+        <locationX>176</locationX>
+        <locationY>480</locationY>
+        <connector>
+            <targetReference>assignNewAccountId</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>FirstName</field>
+            <value>
+                <elementReference>$Record.FirstName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>LastName</field>
+            <value>
+                <elementReference>$Record.LastName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>PersonEmail</field>
+            <value>
+                <elementReference>$Record.Email</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Phone</field>
+            <value>
+                <elementReference>$Record.Phone</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RecordTypeId</field>
+            <value>
+                <elementReference>lookupPersonAccountRT.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordCreates>
+        <name>createOpportunity</name>
+        <label>Create Opportunity</label>
+        <locationX>176</locationX>
+        <locationY>720</locationY>
+        <connector>
+            <targetReference>deleteLead</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>AccountId</field>
+            <value>
+                <elementReference>varAccountId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <elementReference>formulaOppName</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>New Inquiry</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>CloseDate</field>
+            <value>
+                <elementReference>formulaCloseDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>LeadSource</field>
+            <value>
+                <stringValue>Web</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Date_Flexibility__c</field>
+            <value>
+                <elementReference>$Record.Date_Flexibility__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Alternative_Event_Date__c</field>
+            <value>
+                <elementReference>$Record.Alternative_Event_Date__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Event_Type__c</field>
+            <value>
+                <elementReference>$Record.Event_Type__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Services__c</field>
+            <value>
+                <elementReference>$Record.Services__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Estimated_Budget__c</field>
+            <value>
+                <elementReference>$Record.Estimated_Budget__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Estimated_Guest_Count__c</field>
+            <value>
+                <elementReference>$Record.Estimated_Guest_Count__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Venue__c</field>
+            <value>
+                <elementReference>$Record.Venue__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Event_Description__c</field>
+            <value>
+                <elementReference>$Record.Event_Description__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+        <storeOutputAutomatically>false</storeOutputAutomatically>
+    </recordCreates>
+
+    <!-- ═══════════════ RECORD DELETES ═══════════════ -->
+    <recordDeletes>
+        <name>deleteLead</name>
+        <label>Delete Lead</label>
+        <locationX>176</locationX>
+        <locationY>840</locationY>
+        <filterLogic>1</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <object>Lead</object>
+    </recordDeletes>
+
+</Flow>

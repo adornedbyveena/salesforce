@@ -32,7 +32,7 @@ export default class ContractGenerator extends LightningElement {
     @track emailClientName = '';
     @track emailEventName = '';
 
-    accountId; oppData; rawPdfBase64;
+    accountId; oppData; rawPdfBase64; rawContractHtml;
     jsPdfInitialized = false;
     oppSaved = false; accSaved = false;
     oppRecordData = {}; accRecordData = {};
@@ -382,6 +382,7 @@ export default class ContractGenerator extends LightningElement {
             this.emailTo         = this.oppData?.fields?.Client_Email__c?.value || '';
             this.emailSubject    = `Your Event Contract - ${oppName}`;
 
+            this.rawContractHtml = this.buildContractHtml();
             this.currentStep = '2';
             this.isLoading = false;
 
@@ -391,6 +392,225 @@ export default class ContractGenerator extends LightningElement {
             this.isLoading = false;
             this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: msg, variant: 'error' }));
         }
+    }
+
+    buildContractHtml() {
+        const goldLine = '<p class="gold-line" style="display:block;width:100%;border-bottom:2pt solid #D4AF37;margin:15px 0;font-size:0;line-height:0;"></p>';
+
+        const oppName       = this.oppRecordData.Name?.value              || this.oppData?.fields?.Name?.value              || 'Event';
+        const totalAmt      = parseFloat(this.oppRecordData.Total_Amount__c?.value  ?? this.oppData?.fields?.Total_Amount__c?.value  ?? 0).toFixed(2);
+        const depAmt        = parseFloat(this.oppRecordData.Deposit__c?.value       ?? this.oppData?.fields?.Deposit__c?.value       ?? 0).toFixed(2);
+        const balAmt        = parseFloat(this.oppRecordData.Balance_Due__c?.value   ?? this.oppData?.fields?.Balance_Due__c?.value   ?? 0).toFixed(2);
+        const isDepositPaid = this.oppRecordData.Deposit_Paid__c?.value   ?? this.oppData?.fields?.Deposit_Paid__c?.value   ?? false;
+        const eventDateRaw  = this.oppRecordData.CloseDate?.value         || this.oppData?.fields?.CloseDate?.value         || '';
+
+        const billingStreet = this.accRecordData.BillingStreet?.value     || '';
+        const billingCity   = this.accRecordData.BillingCity?.value       || '';
+        const billingState  = this.accRecordData.BillingState?.value      || '';
+        const billingZip    = this.accRecordData.BillingPostalCode?.value || '';
+
+        const formulaName = this.oppData?.fields?.Client_Name_Formula__c?.value;
+        const accName     = this.accRecordData.Name?.value || '';
+        const clientName  = formulaName || accName || 'Client';
+
+        const createdDate   = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+        const eventDate     = eventDateRaw
+            ? new Date(eventDateRaw + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+            : 'TBD';
+        const clientAddress = [billingStreet, billingCity, `${billingState} ${billingZip}`.trim()].filter(Boolean).join(', ');
+        const venue         = clientAddress || 'TBD';
+        const depositString = isDepositPaid
+            ? `A non-refundable deposit of $${depAmt} was paid prior to this Agreement.`
+            : `A non-refundable deposit of $${depAmt} is due upon signing this Agreement.`;
+
+        const dbLines = this.wiredLineItemsResult?.data?.records || [];
+        const lineItemRows = dbLines.map(rec => {
+            const name = rec.fields.Product__r?.value?.fields?.Name?.value || '';
+            const desc = rec.fields.Description__c?.value || '';
+            const qty  = rec.fields.Quantity__c?.value != null ? String(rec.fields.Quantity__c.value) : '';
+            return `<tr>
+                    <td class="line-name" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:35%;font-weight:bold;">${name}</td>
+                    <td class="line-qty"  style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:10%;text-align:center;">${qty}</td>
+                    <td class="line-desc" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:55%;">${desc}</td>
+                </tr>`;
+        }).join('');
+
+        return `${goldLine}
+
+<h2>Introduction</h2>
+<p>This <strong>Event Planning / Decor Contract Agreement (&quot;Agreement&quot;)</strong> is entered into on <strong>${createdDate}</strong> by and between:</p>
+<ul class="contract-list">
+    <li><strong>Adorned By Veena, LLC</strong>, a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at <strong>19730 Shinnery Ridge Ct, Cypress, TX 77433, represented by Veena Boppana, Principal Designer (the &quot;Company&quot;)</strong>.</li>
+    <li><strong>${clientName}</strong>, an individual residing at <strong>${clientAddress || 'address on file'} (&quot;the Client&quot;)</strong>.</li>
+</ul>
+<p><strong>The parties hereby agree as follows:</strong></p>
+
+${goldLine}
+
+<h2>Scope of Services</h2>
+<h3>Event Planning Services</h3>
+<p>The Company agrees to provide the following services for the event hosted by the Client:</p>
+<table class="line-items-table" style="width:100%;border-collapse:collapse;margin:10px 0 15px 0;">
+    <thead>
+        <tr>
+            <th class="line-name" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:35%;">Service / Product</th>
+            <th class="line-qty"  style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:center;font-size:9pt;width:10%;">Qty</th>
+            <th class="line-desc" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:55%;">Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${lineItemRows}
+    </tbody>
+</table>
+<p>These services will be provided in accordance with the terms outlined in this Agreement.</p>
+
+<div style="page-break-after: always;"></div>
+
+<h3 style="font-style:italic;font-weight:bold;">Exclusions</h3>
+<p style="font-style:italic;font-size:9pt;">The following services are excluded from this Agreement:</p>
+<ul class="contract-list" style="font-style:italic;font-size:9pt;">
+    <li>Travel or accommodation costs for The Company or Client unless otherwise specified.</li>
+    <li>Insurance for the event (Client will need to secure separate insurance coverage).</li>
+    <li>Costs for any services or items not explicitly mentioned in this Agreement.</li>
+</ul>
+
+<div class="avoid-break">
+    <h2>Event Details</h2>
+    <ul class="contract-list">
+        <li><strong>Event Name:</strong> ${oppName}</li>
+        <li><strong>Event Date:</strong> ${eventDate}</li>
+        <li><strong>Event Location:</strong> ${venue}</li>
+    </ul>
+</div>
+
+${goldLine}
+
+<div class="avoid-break">
+    <h2>Compensation and Payment Terms</h2>
+    <h3>Fees</h3>
+    <ul class="contract-list">
+        <li>Flat Event Planning Fee: <strong>$${totalAmt}</strong> for all planning and coordination services.</li>
+    </ul>
+    <h3>Payment Schedule</h3>
+    <ul class="contract-list">
+        <li><strong>Deposit:</strong> ${depositString}</li>
+        <li><strong>Final Payment:</strong> The remaining balance of <strong>$${balAmt}</strong> is due no later than the day of the event.</li>
+    </ul>
+    <ul class="contract-list" style="font-style:italic;color:#555;font-size:9.5pt;line-height:1.6;margin-top:15px;">
+        <li>Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.</li>
+        <li>Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.</li>
+        <li><strong>Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.</strong></li>
+    </ul>
+</div>
+
+${goldLine}
+
+<h2>Responsibilities of the Parties</h2>
+
+<div class="avoid-break">
+    <h3>The Company&apos;s Responsibilities</h3>
+    <ul class="contract-list">
+        <li>Provide event planning services as outlined in this Agreement.</li>
+        <li>Coordinate and manage vendors, venue, and logistics for the event.</li>
+        <li>Ensure all event-related activities are completed as scheduled.</li>
+        <li>Maintain communication with Clients to ensure satisfaction and resolve any issues.</li>
+        <li>Provide on-site event management to ensure smooth operations during the event.</li>
+    </ul>
+</div>
+
+<div class="avoid-break">
+    <h3>Client&apos;s Responsibilities</h3>
+    <ul class="contract-list">
+        <li><strong>Information Accuracy:</strong> Provide all event goals, themes, and budget constraints.</li>
+        <li><strong>Decision-Making Authority:</strong> Client must designate one (1) primary point of contact with full authority to make binding decisions and approvals.</li>
+        <li><strong>Financial Obligations:</strong> Ensure timely payments of planning fees and direct vendor invoices.</li>
+        <li><strong>Approvals:</strong> Review and approve designs and contracts within 72 hours of receipt.</li>
+        <li><strong>Venue Logistics:</strong> Provide all necessary access codes, loading-dock info, and permits.</li>
+        <li><strong>Third-Party Agreements:</strong> Client shall sign and be solely responsible for all vendor contracts.</li>
+        <li><strong>Conduct &amp; Liability:</strong> Client is responsible for guest behavior and any damages caused by attendees.</li>
+        <li><strong>Proof of Insurance (COI):</strong> Client is responsible for obtaining &apos;Event Cancellation&apos; or &apos;Host Liability&apos; insurance if required by the venue.</li>
+    </ul>
+</div>
+
+${goldLine}
+
+<div class="avoid-break">
+    <h2>Changes and Cancellations</h2>
+    <h3>Changes to the Event Scope</h3>
+    <p>If Client wishes to make significant changes to the event scope, such as increasing the number of attendees, adding services, or changing the event date, such changes will be documented and may result in additional charges. Changes must be communicated to The Company in writing and approved by both parties.</p>
+    <h3>Event Cancellation</h3>
+    <p>If the event is canceled by the Client:</p>
+    <ul class="contract-list">
+        <li><strong>More than 15 days prior to event date:</strong> Client will be responsible for paying 50% of the total fees (deposit and planning services).</li>
+        <li><strong>Less than 15 days prior to event date:</strong> Client will be responsible for paying 100% of the total fees (deposit and planning services).</li>
+    </ul>
+    <h3>Force Majeure &amp; Limited Liability</h3>
+    <ul class="contract-list">
+        <li>If The Company is unable to perform due to circumstances beyond their reasonable control, including but not limited to hurricanes, tropical storms, regional power grid failures, or other Acts of God &mdash; the Company&apos;s liability shall be limited to refund of the unearned portion of the deposit.</li>
+        <li>The Company shall be entitled to retain a prorated amount of the deposit to compensate for services already rendered (e.g., planning hours, site visits, and administrative costs) up to the date of the event. Neither party shall be liable for any further indirect, consequential, or damages.</li>
+    </ul>
+    <p>This Agreement is governed by the laws of the State of Texas. Any disputes shall be resolved via mandatory mediation in Harris County, Texas, prior to the filing of any lawsuit.</p>
+</div>
+
+${goldLine}
+
+<div class="avoid-break">
+    <h2>Confidentiality</h2>
+    <ul class="contract-list">
+        <li>Both parties agree to keep all sensitive information confidential, including but not limited to event details, pricing, and any proprietary business information disclosed during the term of this Agreement.</li>
+        <li>This confidentiality obligation will survive the termination of this Agreement.</li>
+    </ul>
+    <h2>Governing Law</h2>
+    <ul class="contract-list">
+        <li>This Agreement shall be governed by and construed in accordance with the laws of the State of Texas.</li>
+        <li>Any disputes arising from this Agreement will be resolved in the courts located in Harris County, Texas.</li>
+    </ul>
+</div>
+
+<div style="page-break-before: always;"></div>
+
+<div class="avoid-break">
+    <h2>Miscellaneous Provisions</h2>
+    <h3>Entire Agreement</h3>
+    <ul class="contract-list">
+        <li>This Agreement constitutes the full and complete understanding between the parties regarding the event planning services and supersedes all prior agreements or understandings, whether written or oral.</li>
+    </ul>
+    <h3>Amendments</h3>
+    <ul class="contract-list">
+        <li>Any amendments or modifications to this Agreement must be made in writing and signed by both parties.</li>
+    </ul>
+    <h3>Severability</h3>
+    <ul class="contract-list">
+        <li>If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</li>
+    </ul>
+    <p style="margin: 15px 0 10px 0;">For any inquiries regarding this agreement, please contact <strong>Veena Boppana</strong> at <strong>veena@adornedbyveena.com</strong></p>
+</div>
+
+${goldLine}
+
+<div class="avoid-break">
+    <h2>Acknowledgement &amp; Acceptance</h2>
+    <p>By signing below, the parties acknowledge that they have read, understood, and agree to the terms and conditions outlined in this Agreement.</p>
+    <table class="sig-table" style="width:100%;margin-top:20px;">
+        <tr>
+            <td style="width:45%;vertical-align:bottom;">
+                <div style="border-bottom:1px solid #020C1D;height:50px;"></div>
+                <div style="font-size:10pt;margin-top:4px;">
+                    <strong>Adorned by Veena, LLC</strong><br/>
+                    Date: ${createdDate}
+                </div>
+            </td>
+            <td style="width:10%;"></td>
+            <td style="width:45%;vertical-align:bottom;text-align:right;">
+                <div style="border-bottom:1px solid #020C1D;height:50px;"></div>
+                <div style="font-size:10pt;margin-top:4px;text-align:right;">
+                    <strong>${clientName}</strong><br/>
+                    Date: ${createdDate}
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>`;
     }
 
     goBack() {
@@ -408,7 +628,8 @@ export default class ContractGenerator extends LightningElement {
             await sendContractEmail({
                 recordId: this.recordId,
                 pdfBase64: this.rawPdfBase64,
-                fileName: this.pdfFileName
+                fileName: this.pdfFileName,
+                contractHtml: this.rawContractHtml
             });
             this.dispatchEvent(new ShowToastEvent({
                 title: 'Contract Sent',

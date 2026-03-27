@@ -1,7 +1,7 @@
 public with sharing class ContractController {
 
     @AuraEnabled
-    public static void sendContractEmail(String recordId, String pdfBase64, String fileName) {
+    public static void sendContractEmail(String recordId, String pdfBase64, String fileName, String contractHtml) {
         Opportunity opp = [
             SELECT Id, Name, CloseDate, Client_Email__c, Client_Name_Formula__c, Account.Name
             FROM Opportunity
@@ -42,7 +42,8 @@ public with sharing class ContractController {
             Contract_Status__c    = 'Sent',
             Contract_Sent_Date__c = Date.today(),
             StageName             = 'Contract Sent',
-            Drive_Folder_URL__c   = folderUrl
+            Drive_Folder_URL__c   = folderUrl,
+            Contract_HTML__c      = contractHtml
         );
 
         // Surface email failure after DML is committed

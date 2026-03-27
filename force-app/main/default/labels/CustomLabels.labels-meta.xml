@@ -7,4 +7,11 @@
         <shortDescription>Contract Site URL</shortDescription>
         <value>https://orgfarm-e920c24cd7-dev-ed.develop.my.salesforce-sites.com/abv/ContractAcceptance</value>
     </labels>
+    <labels>
+        <fullName>Quote_Site_URL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quote Site URL</shortDescription>
+        <value>https://orgfarm-e920c24cd7-dev-ed.develop.my.salesforce-sites.com/abv/QuoteAcceptance</value>
+    </labels>
 </CustomLabels>

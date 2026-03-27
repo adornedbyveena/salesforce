@@ -1,0 +1,212 @@
+<apex:page controller="QuoteSiteController" showHeader="false" standardStylesheets="false" sidebar="false" docType="html-5.0">
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Quote – Adorned By Veena</title>
+    <style>
+
+        /* ── Reset ── */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Page ── */
+        html { height: 100%; background-color: #F7E7CE; }
+        body { height: 100%; font-family: Helvetica, Arial, sans-serif; font-size: 9pt; color: #020C1D; line-height: 1.5; background-color: #F7E7CE; }
+
+        .page-bg { background-color: #F7E7CE; min-height: 100%; }
+
+        .abv-header { background: #D4AF37; padding: 20px 32px; text-align: center; }
+        .abv-header h1 { color: #fff; font-size: 22px; font-weight: bold; letter-spacing: 1px; }
+
+        .abv-container { max-width: 900px; margin: 8px auto; padding: 0 16px 32px; }
+        .abv-card { background-color: #F7E7CE; padding: 32px 48px; }
+
+        .abv-status {
+            text-align: center; padding: 20px 0 28px; font-size: 17px;
+            color: #555; border-bottom: 1px solid #c9a96e; margin-bottom: 28px;
+        }
+        .abv-status.success  { color: #2e7d32; font-weight: bold; font-size: 18px; border: none; }
+        .abv-status.declined { color: #c62828; border: none; }
+
+        .error-card { text-align: center; padding: 60px 32px; color: #888; font-size: 18px; }
+
+        .abv-actions { text-align: center; margin-top: 40px; padding-top: 32px; border-top: 2px solid #c9a96e; }
+        .btn-approve {
+            display: inline-block; background: #D4AF37; color: #fff; border: none;
+            padding: 14px 40px; font-size: 16px; font-weight: bold;
+            cursor: pointer; min-width: 220px; margin: 4px;
+        }
+        .btn-approve:hover { background: #b8962e; }
+        .btn-decline {
+            display: inline-block; background: #fff; color: #999; border: 2px solid #ddd;
+            padding: 14px 40px; font-size: 16px; font-weight: bold;
+            cursor: pointer; min-width: 160px; margin: 4px;
+        }
+        .btn-decline:hover { background: #f9f9f9; color: #666; }
+
+        /* ── Quote document styles ── */
+        .header-container { text-align: center; margin-bottom: 25px; }
+        .doc-title { font-size: 18pt; font-weight: bold; color: #020C1D; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; }
+
+        .gold-line { display: block; width: 100%; border-bottom: 2pt solid #D4AF37; margin: 15px 0; font-size: 0; line-height: 0; }
+
+        h2 { font-size: 8pt; font-weight: bold; color: #020C1D; margin: 15px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        p  { margin: 5px 0; }
+
+        .avoid-break { page-break-inside: avoid; }
+
+        /* ── Line items table (4 columns with pricing) ── */
+        .line-items-table { width: 100%; border-collapse: collapse; margin: 10px 0 15px 0; }
+        .line-items-table th { background-color: #D4AF37; color: #020C1D; font-weight: bold; padding: 8px; font-size: 9pt; }
+        .line-items-table td { padding: 8px; font-size: 9.5pt; border-bottom: 1px solid #D4AF37; vertical-align: top; }
+        .line-name  { width: 45%; font-weight: bold; text-align: left; }
+        .line-qty   { width: 10%; text-align: center; }
+        .line-price { width: 20%; text-align: right; }
+        .line-total { width: 25%; text-align: right; font-weight: bold; }
+        .line-desc  { font-weight: normal; font-size: 9pt; color: #444; }
+
+        /* ── Summary totals ── */
+        .summary-table { width: 100%; max-width: 340px; margin: 10px 0 10px auto; border-collapse: collapse; }
+        .summary-table td { padding: 5px 8px; font-size: 10pt; }
+        .summary-table .summary-total td { border-top: 2pt solid #D4AF37; font-weight: bold; padding-top: 8px; }
+        .summary-table .summary-deposit td { color: #555; font-style: italic; }
+
+        .payment-note { font-style: italic; color: #555; font-size: 9.5pt; margin-top: 15px; line-height: 1.6; }
+
+        /* ── Approval Section ── */
+        .esig-section {
+            background: #fdf8ef; border: 2px solid #D4AF37;
+            padding: 28px 32px; margin-top: 32px;
+        }
+        .esig-title { font-size: 13pt; font-weight: bold; color: #020C1D; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+        .esig-desc  { font-size: 9.5pt; color: #555; margin-bottom: 20px; line-height: 1.6; }
+        .esig-field-label { display: block; font-weight: bold; font-size: 10pt; margin-bottom: 6px; color: #020C1D; }
+        .esig-input {
+            width: 100%; padding: 12px 14px; font-size: 14pt;
+            font-family: Georgia, serif; font-style: italic;
+            border: 1px solid #c9a96e; background: #fff; color: #020C1D; margin-bottom: 18px;
+        }
+        .esig-input:focus { outline: 2px solid #D4AF37; }
+        .esig-consent { display: table; margin-bottom: 14px; }
+        .esig-consent input[type="checkbox"] {
+            display: table-cell; vertical-align: top;
+            margin-top: 3px; margin-right: 10px; width: 16px; height: 16px; cursor: pointer;
+        }
+        .esig-consent label { display: table-cell; font-size: 9.5pt; color: #333; cursor: pointer; line-height: 1.5; }
+        .esig-error {
+            background: #fdecea; border: 1px solid #e57373; color: #c62828;
+            padding: 10px 14px; font-size: 9.5pt; margin-bottom: 14px; display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="page-bg">
+
+    <div class="abv-header">
+        <h1>ADORNED BY VEENA</h1>
+    </div>
+
+    <div class="abv-container">
+        <apex:form>
+
+            <!-- Invalid token / not found -->
+            <apex:outputPanel rendered="{!NOT(showQuote)}">
+                <div class="abv-card error-card">
+                    <apex:outputText value="{!statusMessage}"/>
+                </div>
+            </apex:outputPanel>
+
+            <!-- Quote content -->
+            <apex:outputPanel rendered="{!showQuote}">
+                <div class="abv-card">
+
+                    <!-- Status message -->
+                    <apex:outputPanel rendered="{!NOT(ISBLANK(statusMessage))}">
+                        <div class="abv-status">
+                            <apex:outputText value="{!statusMessage}"/>
+                        </div>
+                    </apex:outputPanel>
+
+                    <!-- Document header -->
+                    <table style="width:100%;margin-bottom:20px;"><tr><td style="text-align:center;padding:0;">
+                        <apex:image url="{!URLFOR($Resource.ABVLogo512)}" style="height:80px;width:auto;" alt="Adorned By Veena"/>
+                        <div class="doc-title" style="font-size:18pt;font-weight:bold;color:#020C1D;letter-spacing:2px;text-transform:uppercase;text-align:center;margin-top:6px;">EVENT QUOTE</div>
+                    </td></tr></table>
+
+                    <!-- Quote HTML body -->
+                    <div class="quote-content">
+                        <apex:outputText escape="false" value="{!quoteHtml}"/>
+                    </div>
+
+                    <!-- Approval section -->
+                    <apex:outputPanel rendered="{!showActions}">
+
+                        <apex:messages styleClass="esig-error" style="display:block;"/>
+
+                        <div class="esig-section">
+                            <div class="esig-title">Confirm Your Approval</div>
+                            <p class="esig-desc">
+                                By entering your name below and clicking
+                                <strong>"Approve This Quote"</strong>, you confirm that you have
+                                reviewed and approve the services and pricing listed above.
+                                A contract and deposit will follow to officially confirm your booking.
+                            </p>
+
+                            <label class="esig-field-label" for="{!$Component.approvalNameInput}">
+                                Full Name *
+                            </label>
+                            <apex:inputText id="approvalNameInput"
+                                value="{!approvedName}"
+                                styleClass="esig-input"
+                                html-placeholder="Type your full name"/>
+
+                            <div class="esig-consent">
+                                <input type="checkbox" id="approvalConsent"/>
+                                <label for="approvalConsent">
+                                    I have reviewed this quote and approve the listed services and pricing.
+                                </label>
+                            </div>
+
+                            <div id="approvalError" class="esig-error">
+                                Please enter your name and check the box to approve.
+                            </div>
+                        </div>
+
+                        <div class="abv-actions">
+                            <apex:commandButton value="Approve This Quote"
+                                action="{!approve}"
+                                styleClass="btn-approve"
+                                onclick="return validateApproval();"/>
+                            <apex:commandButton value="Decline"
+                                action="{!decline}"
+                                styleClass="btn-decline"/>
+                        </div>
+                    </apex:outputPanel>
+
+                </div>
+            </apex:outputPanel>
+
+        </apex:form>
+    </div>
+
+</div>
+
+<script>
+function validateApproval() {
+    var nameInput = document.querySelector('input[id$="approvalNameInput"]');
+    var consent   = document.getElementById('approvalConsent');
+    var errDiv    = document.getElementById('approvalError');
+
+    if (!nameInput || !nameInput.value.trim() || !consent || !consent.checked) {
+        if (errDiv) errDiv.style.display = 'block';
+        if (nameInput && !nameInput.value.trim()) nameInput.focus();
+        return false;
+    }
+    if (errDiv) errDiv.style.display = 'none';
+    return true;
+}
+</script>
+
+</body>
+</html>
+</apex:page>
