@@ -8,5 +8,7 @@
   "name": "ABV SF",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "66.0"
+  "sourceApiVersion": "66.0",
+  "defaultdevhubusername": "abvdevorg",
+  "defaultusername": "abvdevorg"
 }
