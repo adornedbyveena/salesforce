@@ -8,6 +8,10 @@
         <label><!-- Contract Site URL --></label>
         <name>Contract_Site_URL</name>
     </customLabels>
+    <customLabels>
+        <label><!-- Quote Site URL --></label>
+        <name>Quote_Site_URL</name>
+    </customLabels>
     <flowDefinitions>
         <flows>
             <choices>
@@ -99,6 +103,14 @@
             </textTemplates>
         </flows>
         <fullName>Invoice_Contract_Email_Flow</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows/>
+        <fullName>Lead_Auto_Convert</fullName>
+    </flowDefinitions>
+    <flowDefinitions>
+        <flows/>
+        <fullName>Sync_Amount_From_Total</fullName>
     </flowDefinitions>
     <quickActions>
         <label><!-- LogACall --></label>

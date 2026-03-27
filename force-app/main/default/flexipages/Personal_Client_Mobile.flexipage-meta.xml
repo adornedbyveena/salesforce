@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
-
-    <!-- ═══════════════════════════════════════════
-         HEADER: Highlights panel
-    ═══════════════════════════════════════════ -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -49,12 +45,6 @@
         <name>header</name>
         <type>Region</type>
     </flexiPageRegions>
-
-    <!-- ═══════════════════════════════════════════
-         FACETS: Client info fields
-    ═══════════════════════════════════════════ -->
-
-    <!-- Contact Details fields -->
     <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
@@ -123,10 +113,6 @@
         <name>Facet-mob-acc-contact-col</name>
         <type>Facet</type>
     </flexiPageRegions>
-
-    <!-- ═══════════════════════════════════════════
-         MAIN REGION
-    ═══════════════════════════════════════════ -->
     <flexiPageRegions>
         <itemInstances>
             <componentInstance>
@@ -223,7 +209,6 @@
         <name>main</name>
         <type>Region</type>
     </flexiPageRegions>
-
     <masterLabel>Personal Client Phone</masterLabel>
     <parentFlexiPage>sfa__PersonAccount_rec_L</parentFlexiPage>
     <sobjectType>Account</sobjectType>

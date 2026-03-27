@@ -107,7 +107,7 @@
     </div>
 
     <div class="abv-container">
-        <apex:form>
+        <apex:form >
 
             <!-- Invalid token / not found -->
             <apex:outputPanel rendered="{!NOT(showQuote)}">

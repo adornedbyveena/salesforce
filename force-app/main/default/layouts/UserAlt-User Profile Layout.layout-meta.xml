@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
     <layoutSections>
-        <customLabel>false</customLabel>
+        <customLabel>true</customLabel>
         <detailHeading>false</detailHeading>
         <editHeading>true</editHeading>
         <label>About</label>
@@ -79,20 +79,6 @@
     </relatedLists>
     <relatedLists>
         <relatedList>RelatedFileList</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>ProfileSkill</fields>
-        <fields>EndorsementCount</fields>
-        <fields>CreatedDate</fields>
-        <relatedList>ProfileSkillUserByUserRelatedList</relatedList>
-    </relatedLists>
-    <relatedLists>
-        <fields>ImageUrl</fields>
-        <fields>Definition</fields>
-        <fields>Message</fields>
-        <fields>Giver</fields>
-        <fields>Recipient</fields>
-        <relatedList>WorkBadgeRelatedList</relatedList>
     </relatedLists>
     <relatedLists>
         <relatedList>UserFollowersList</relatedList>

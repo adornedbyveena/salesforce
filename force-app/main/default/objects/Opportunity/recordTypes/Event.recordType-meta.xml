@@ -209,6 +209,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>Quote_Status__c</picklist>
+        <values>
+            <fullName>Approved</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Declined</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sent</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>Services__c</picklist>
         <values>
             <fullName>Decor %26 Coordination</fullName>
