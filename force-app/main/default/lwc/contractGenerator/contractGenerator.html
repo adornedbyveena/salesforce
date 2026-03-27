@@ -107,17 +107,6 @@
                     </div>
                 </div>
 
-                <!-- Compose footer -->
-                <div style="background:#fff; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #e0e0e0;">
-                    <lightning-button
-                        variant="brand"
-                        label="Send"
-                        icon-name="utility:send"
-                        icon-position="left"
-                        onclick={saveAndSend}>
-                    </lightning-button>
-                    <lightning-icon icon-name="utility:delete" size="small" style="cursor:pointer; color:#666;" onclick={closeAction}></lightning-icon>
-                </div>
             </div>
         </template>
     </div>
@@ -134,6 +123,9 @@
             </template>
             <template if:true={isStep2}>
                 <lightning-button label="Next: Preview Email" variant="brand" onclick={previewEmail}></lightning-button>
+            </template>
+            <template if:true={isStep3}>
+                <lightning-button variant="brand" label="Send" icon-name="utility:send" icon-position="left" onclick={saveAndSend}></lightning-button>
             </template>
         </div>
     </footer>
