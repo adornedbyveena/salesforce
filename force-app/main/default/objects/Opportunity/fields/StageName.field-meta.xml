@@ -4,5 +4,6 @@
     <trackFeedHistory>true</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
+    <defaultValue>New Inquiry</defaultValue>
     <type>Picklist</type>
 </CustomField>
