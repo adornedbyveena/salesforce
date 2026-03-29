@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CspTrustedSite xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Google Photos CDN — redirect target for Places photo URLs</description>
+    <endpointUrl>https://lh3.googleusercontent.com</endpointUrl>
+    <isActive>true</isActive>
+    <isApplicableToConnectSrc>false</isApplicableToConnectSrc>
+    <isApplicableToFontSrc>false</isApplicableToFontSrc>
+    <isApplicableToFrameSrc>false</isApplicableToFrameSrc>
+    <isApplicableToImgSrc>true</isApplicableToImgSrc>
+    <isApplicableToMediaSrc>false</isApplicableToMediaSrc>
+</CspTrustedSite>

@@ -8,9 +8,48 @@
             <lightning-spinner alternative-text="Processing..." size="medium"></lightning-spinner>
         </template>
 
-        <!-- STEP 1: Edit Form -->
+        <!-- STEP 1: Line Items -->
         <template if:true={isStep1}>
-            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Confirm Event &amp; Client Details</div>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">1. Service Line Items</div>
+            <div>
+                <template for:each={rows} for:item="row">
+                    <div key={row.id} class="slds-box slds-m-bottom_medium slds-theme_shade slds-is-relative">
+                        <lightning-record-edit-form record-id={row.recordId} object-api-name="Line_Item__c" onsuccess={handleLineItemSuccess} onerror={handleFormError}>
+                            <div class="slds-hide">
+                                <lightning-input-field field-name="Event__c" value={recordId}></lightning-input-field>
+                            </div>
+                            <div class="slds-grid slds-gutters slds-wrap">
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                                    <lightning-input-field field-name="Product__c" required></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_2-of-12">
+                                    <lightning-input-field field-name="Quantity__c" required></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_3-of-12">
+                                    <lightning-input-field field-name="Sales_Price__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_2-of-12">
+                                    <lightning-input-field field-name="Discount__c"></lightning-input-field>
+                                </div>
+                                <div class="slds-col slds-size_5-of-12 slds-medium-size_1-of-12 slds-p-top_large slds-text-align_right">
+                                    <lightning-button-icon icon-name="utility:delete" variant="error" data-id={row.id} onclick={removeRow}></lightning-button-icon>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                    <lightning-input-field field-name="Description__c"></lightning-input-field>
+                                </div>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                </template>
+            </div>
+            <div class="slds-p-top_medium">
+                <lightning-button label="+ Add Another Item" icon-name="utility:add" onclick={addRow}></lightning-button>
+            </div>
+        </template>
+
+        <!-- STEP 2: Event & Client Details -->
+        <template if:true={isStep2}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">2. Confirm Event &amp; Client Details</div>
             <div class="slds-grid slds-gutters slds-wrap">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
                     <lightning-record-edit-form record-id={recordId} object-api-name="Opportunity" data-id="oppForm" onsuccess={handleOppSuccess} onerror={handleFormError}>
@@ -42,9 +81,9 @@
             </div>
         </template>
 
-        <!-- STEP 2: PDF Preview -->
-        <template if:true={isStep2}>
-            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">2. Review Contract PDF</div>
+        <!-- STEP 3: PDF Preview -->
+        <template if:true={isStep3}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">3. Review Contract PDF</div>
             <div class="slds-box slds-theme_shade slds-text-align_center slds-m-top_large slds-p-around_xx-large">
                 <lightning-icon icon-name="doctype:pdf" size="large"></lightning-icon>
                 <h3 class="slds-text-heading_medium slds-m-top_medium">Contract Generated</h3>
@@ -58,11 +97,10 @@
             </div>
         </template>
 
-        <!-- STEP 3: Email Compose Preview -->
-        <template if:true={isStep3}>
-            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">3. Preview &amp; Send Email</div>
+        <!-- STEP 4: Email Compose Preview -->
+        <template if:true={isStep4}>
+            <div class="slds-text-title_caps slds-m-bottom_small slds-text-color_weak">4. Preview &amp; Send Email</div>
 
-            <!-- Gmail-style compose window -->
             <div class="compose-window">
 
                 <!-- Compose header -->
@@ -114,16 +152,19 @@
     <footer class="slds-modal__footer slds-grid slds-grid_align-spread">
         <div>
             <lightning-button label="Cancel" onclick={closeAction}></lightning-button>
-            <lightning-button label="Back"   onclick={goBack} if:false={isStep1} class="slds-m-left_x-small"></lightning-button>
+            <lightning-button label="Back" onclick={goBack} if:false={isStep1} class="slds-m-left_x-small"></lightning-button>
         </div>
         <div>
             <template if:true={isStep1}>
-                <lightning-button label="Next: Generate Contract" variant="brand" onclick={saveStep1}></lightning-button>
+                <lightning-button label="Next: Event Details" variant="brand" onclick={saveStep1}></lightning-button>
             </template>
             <template if:true={isStep2}>
-                <lightning-button label="Next: Preview Email" variant="brand" onclick={previewEmail}></lightning-button>
+                <lightning-button label="Next: Generate Contract" variant="brand" onclick={saveStep2}></lightning-button>
             </template>
             <template if:true={isStep3}>
+                <lightning-button label="Next: Preview Email" variant="brand" onclick={previewEmail}></lightning-button>
+            </template>
+            <template if:true={isStep4}>
                 <lightning-button variant="brand" label="Send" icon-name="utility:send" icon-position="left" onclick={saveAndSend}></lightning-button>
             </template>
         </div>

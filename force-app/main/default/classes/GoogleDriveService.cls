@@ -2,6 +2,20 @@ public class GoogleDriveService {
 
     static final String NC = 'callout:Google_APIs';
 
+    static final String REAUTH_MSG =
+        'Google Drive authentication has expired. ' +
+        'To fix: Setup → Security → Named Credentials → External Credentials → ' +
+        'Google_OAuth → Named Principals → ABV_Google → Authenticate.';
+
+    static void checkResponse(HttpResponse res, String context) {
+        if (res.getStatusCode() == 401) {
+            throw new AuraHandledException(REAUTH_MSG);
+        }
+        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
+            throw new AuraHandledException('Could not connect to Google Drive. Please try again or contact support.');
+        }
+    }
+
     // Returns folder ID — creates folder if not found under parentId (null = My Drive root)
     static String getOrCreateFolder(String folderName, String parentId) {
         String q = 'name=\'' + folderName.replace('\'', '\\\'')
@@ -12,6 +26,7 @@ public class GoogleDriveService {
         req.setEndpoint(NC + '/drive/v3/files?q=' + EncodingUtil.urlEncode(q, 'UTF-8') + '&fields=files(id)');
         req.setMethod('GET');
         HttpResponse res = new Http().send(req);
+        checkResponse(res, 'Drive folder search');
 
         Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
         List<Object> files = (List<Object>) body.get('files');
@@ -33,9 +48,7 @@ public class GoogleDriveService {
         cr.setBody(JSON.serialize(meta));
         HttpResponse crRes = new Http().send(cr);
 
-        if (crRes.getStatusCode() < 200 || crRes.getStatusCode() >= 300) {
-            throw new CalloutException('Drive folder create failed: ' + crRes.getBody());
-        }
+        checkResponse(crRes, 'Drive folder create');
         return (String) ((Map<String, Object>) JSON.deserializeUntyped(crRes.getBody())).get('id');
     }
 
@@ -57,9 +70,7 @@ public class GoogleDriveService {
         createReq.setBody(JSON.serialize(meta));
         HttpResponse createRes = new Http().send(createReq);
 
-        if (createRes.getStatusCode() < 200 || createRes.getStatusCode() >= 300) {
-            throw new CalloutException('Drive file create failed: ' + createRes.getBody());
-        }
+        checkResponse(createRes, 'Drive file create');
         String fileId = (String) ((Map<String, Object>) JSON.deserializeUntyped(createRes.getBody())).get('id');
 
         // Step 2 — upload binary PDF content
@@ -71,9 +82,7 @@ public class GoogleDriveService {
         uploadReq.setTimeout(120000);
         HttpResponse uploadRes = new Http().send(uploadReq);
 
-        if (uploadRes.getStatusCode() < 200 || uploadRes.getStatusCode() >= 300) {
-            throw new CalloutException('Drive upload failed: ' + uploadRes.getBody());
-        }
+        checkResponse(uploadRes, 'Drive upload');
 
         return 'https://drive.google.com/drive/folders/' + eventId;
     }

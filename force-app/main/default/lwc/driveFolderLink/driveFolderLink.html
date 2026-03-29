@@ -1,22 +1,59 @@
 <template>
-    <lightning-card title="Google Drive Folder" icon-name="utility:connected_apps">
-        <div class="slds-p-around_medium">
+    <lightning-card>
+        <span slot="title" class="card-title">
+            <lightning-icon icon-name="utility:open_folder" size="x-small" class="slds-m-right_x-small title-icon"></lightning-icon>
+            Documents Repository
+        </span>
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+
             <template if:true={folderUrl}>
-                <div class="slds-media slds-media_center">
-                    <div class="slds-media__figure">
-                        <lightning-icon icon-name="doctype:gdrive" size="medium"></lightning-icon>
+
+                <!-- Loading -->
+                <template if:true={isLoading}>
+                    <div class="loading-wrap">
+                        <lightning-spinner size="small" alternative-text="Loading files..."></lightning-spinner>
                     </div>
-                    <div class="slds-media__body">
-                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">Contracts &amp; Invoices</p>
-                        <a href={folderUrl} target="_blank" rel="noopener noreferrer" class="slds-text-link">
-                            Open Folder in Google Drive
-                        </a>
-                    </div>
+                </template>
+
+                <!-- Error -->
+                <template if:true={errorMessage}>
+                    <p class="slds-text-color_error slds-text-body_small">{errorMessage}</p>
+                </template>
+
+                <!-- File list -->
+                <template if:true={hasFiles}>
+                    <ul class="file-list">
+                        <template for:each={files} for:item="file">
+                            <li key={file.key} class="file-item">
+                                <lightning-icon icon-name={file.icon} size="x-small" class="file-icon"></lightning-icon>
+                                <a href={file.webViewLink} target="_blank" rel="noopener noreferrer" class="file-name slds-text-link">
+                                    {file.name}
+                                </a>
+                                <span class="file-date">{file.formattedDate}</span>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+
+                <!-- No files yet -->
+                <template if:true={showEmpty}>
+                    <p class="slds-text-body_small slds-text-color_weak">No files in this folder yet.</p>
+                </template>
+
+                <!-- Open folder link -->
+                <div class="folder-footer slds-m-top_small">
+                    <a href={folderUrl} target="_blank" rel="noopener noreferrer" class="slds-text-link slds-text-body_small">
+                        <lightning-icon icon-name="doctype:gdrive" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                        Open folder in Google Drive
+                    </a>
                 </div>
+
             </template>
+
             <template if:false={folderUrl}>
                 <p class="slds-text-color_weak slds-text-body_small">No Drive folder yet. Generate a contract or invoice to create one.</p>
             </template>
+
         </div>
     </lightning-card>
 </template>

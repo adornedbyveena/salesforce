@@ -66,5 +66,7 @@ export default class MultilineEventLineItems extends LightningElement {
     handleError(event) {
         this.isSaving = false;
         console.error('Save Error:', JSON.stringify(event.detail));
+        const msg = event.detail?.detail || 'Could not save line items. Please check the values and try again.';
+        this.dispatchEvent(new ShowToastEvent({ title: 'Save Failed', message: msg, variant: 'error' }));
     }
 }

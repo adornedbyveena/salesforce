@@ -4,6 +4,11 @@
 
 package.xml
 
+# Google OAuth credentials - never deploy these, they reset stored tokens and contain placeholder secrets
+**/externalCredentials/Google_OAuth.externalCredential-meta.xml
+**/namedCredentials/Google_APIs.namedCredential-meta.xml
+**/authproviders/Google_ABV.authprovider-meta.xml
+
 # LWC configuration files
 **/jsconfig.json
 **/.eslintrc.json

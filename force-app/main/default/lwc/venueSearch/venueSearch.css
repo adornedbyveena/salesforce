@@ -1,0 +1,175 @@
+/* ── Venue name / header ── */
+.venue-header {
+    border-left: 3px solid #D4AF37;
+    padding-left: 10px;
+}
+
+.venue-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #020c1d;
+    margin: 0 0 2px 0;
+}
+
+.venue-address {
+    font-size: 12px;
+    color: #444;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.venue-meta {
+    font-size: 12px;
+    color: #777;
+    margin: 4px 0 0 0;
+}
+
+/* ── Street View image ── */
+.street-view-wrap {
+    display: inline-block;
+    border-radius: 6px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.street-view-img {
+    width: 240px;
+    height: 140px;
+    object-fit: contain;
+    display: block;
+}
+
+/* ── Clear venue button ── */
+.clear-venue-btn {
+    float: right;
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: #c23934;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-venue-btn:hover {
+    text-decoration: underline;
+}
+
+/* ── Clickable address link ── */
+.venue-address-link {
+    text-decoration: none;
+    display: block;
+}
+
+.venue-address-link:hover .venue-address {
+    color: #0070d2;
+    text-decoration: underline;
+}
+
+/* ── Footer: distance + directions ── */
+.venue-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.venue-distance {
+    font-size: 12px;
+    color: #666;
+    margin: 0;
+}
+
+/* ── Section divider ── */
+.divider {
+    border-top: 1px solid #e0e0e0;
+    margin-top: 4px;
+}
+
+/* ── Web form banner ── */
+.web-form-banner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    background: #fff8e1;
+    border-left: 3px solid #D4AF37;
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    font-size: 12px;
+}
+
+.web-form-label {
+    font-weight: 600;
+    color: #444;
+    white-space: nowrap;
+}
+
+.web-form-text {
+    color: #555;
+    font-style: italic;
+    flex: 1;
+}
+
+/* ── Status messages ── */
+.status-success {
+    color: #2e844a;
+    font-size: 12px;
+    margin: 0;
+}
+
+.status-error {
+    color: #c23934;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* ── Suggestions dropdown ── */
+.suggestions-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f5f0e8;
+}
+
+.suggestion-main {
+    font-size: 13px;
+    color: #181818;
+    font-weight: 500;
+}
+
+.suggestion-secondary {
+    font-size: 12px;
+    color: #777;
+    margin-top: 2px;
+}
+
+/* ── Card title ── */
+.card-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+

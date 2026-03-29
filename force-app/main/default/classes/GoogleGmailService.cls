@@ -2,6 +2,18 @@ public class GoogleGmailService {
 
     static final String NC = 'callout:Google_APIs';
 
+    private static final String REAUTH_MSG =
+        'Google authentication has expired. ' +
+        'To fix: Setup → Security → Named Credentials → External Credentials → ' +
+        'Google_OAuth → Named Principals → ABV_Google → Authenticate.';
+
+    private static void checkResponse(HttpResponse res) {
+        if (res.getStatusCode() == 401) throw new AuraHandledException(REAUTH_MSG);
+        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
+            throw new CalloutException('Email could not be sent. Please try again or contact support.');
+        }
+    }
+
     public static void sendContractEmail(
         String toEmail,
         String clientName,
@@ -38,9 +50,7 @@ public class GoogleGmailService {
         req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
-        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
-            throw new CalloutException('Gmail send failed (' + res.getStatusCode() + '): ' + res.getBody());
-        }
+        checkResponse(res);
     }
 
     public static void sendInvoiceEmail(String toEmail, String clientName, String eventName, String pdfBase64, String fileName) {
@@ -83,9 +93,7 @@ public class GoogleGmailService {
         req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
-        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
-            throw new CalloutException('Gmail invoice send failed (' + res.getStatusCode() + '): ' + res.getBody());
-        }
+        checkResponse(res);
     }
 
     public static void sendQuoteEmail(String toEmail, String clientName, String eventName, String quoteUrl, String pdfBase64, String fileName) {
@@ -135,9 +143,7 @@ public class GoogleGmailService {
         req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
-        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
-            throw new CalloutException('Gmail quote send failed (' + res.getStatusCode() + '): ' + res.getBody());
-        }
+        checkResponse(res);
     }
 
     public static void sendQuoteApprovedConfirmation(String toEmail, String clientName, String eventName, String approvedName, DateTime approvedAt) {
@@ -175,9 +181,7 @@ public class GoogleGmailService {
         req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
-        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
-            throw new CalloutException('Gmail quote approval confirmation failed (' + res.getStatusCode() + '): ' + res.getBody());
-        }
+        checkResponse(res);
     }
 
     public static void sendContractSignedConfirmation(String toEmail, String clientName, String eventName, String signedName, DateTime signedAt) {
@@ -215,9 +219,7 @@ public class GoogleGmailService {
         req.setTimeout(120000);
 
         HttpResponse res = new Http().send(req);
-        if (res.getStatusCode() < 200 || res.getStatusCode() >= 300) {
-            throw new CalloutException('Gmail signed confirmation failed (' + res.getStatusCode() + '): ' + res.getBody());
-        }
+        checkResponse(res);
     }
 
     static String buildEmailBody(String clientName, String eventName, String contractUrl) {

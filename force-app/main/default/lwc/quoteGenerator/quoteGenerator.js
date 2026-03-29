@@ -18,8 +18,10 @@ const OPPORTUNITY_FIELDS = [
     'Opportunity.CloseDate',
     'Opportunity.AccountId',
     'Opportunity.Account.Name',
-    'Opportunity.Estimated_Budget__c',
+    'Opportunity.Total_Amount__c',
     'Opportunity.Deposit__c',
+    'Opportunity.Balance_Due__c',
+    'Opportunity.Deposit_Paid__c',
     'Opportunity.Client_Name_Formula__c',
     'Opportunity.Client_Email__c'
 ];
@@ -86,9 +88,9 @@ export default class QuoteGenerator extends LightningElement {
 
     removeRow(e) {
         const id  = e.target.dataset.id;
-        const row = this.rows.find(r => r.id === id);
+        const row = this.rows.find(r => String(r.id) === id);
         if (row && row.recordId) deleteRecord(row.recordId);
-        this.rows = this.rows.filter(r => r.id !== id);
+        this.rows = this.rows.filter(r => String(r.id) !== id);
     }
 
     saveStep1() {
@@ -115,7 +117,32 @@ export default class QuoteGenerator extends LightningElement {
 
     handleOppSuccess(event) { this.oppRecordData = event.detail.fields; this.oppSaved = true; this.checkStep2Done(); }
     handleAccSuccess(event) { this.accRecordData = event.detail.fields; this.accSaved = true; this.checkStep2Done(); }
-    handleFormError(event)  { console.error('Form Error:', event.detail); this.isLoading = false; }
+    handleFormError(event) {
+        this.isLoading = false;
+        const FIELD_LABELS = {
+            Product__c: 'Product', Quantity__c: 'Quantity', Sales_Price__c: 'Unit Price',
+            Discount__c: 'Discount', Description__c: 'Description',
+            Name: 'Name', CloseDate: 'Event Date',
+            Total_Amount__c: 'Total Amount', Deposit__c: 'Deposit',
+            Balance_Due__c: 'Balance Due', Deposit_Paid__c: 'Deposit Paid',
+            PersonEmail: 'Email', Phone: 'Phone',
+            BillingStreet: 'Billing Street', BillingCity: 'Billing City',
+            BillingState: 'Billing State', BillingPostalCode: 'Billing Zip'
+        };
+        const detail = event.detail;
+        const messages = [];
+        if (detail?.output?.fieldErrors) {
+            Object.entries(detail.output.fieldErrors).forEach(([field, errs]) => {
+                const label = FIELD_LABELS[field] || field;
+                errs.forEach(e => messages.push(`${label}: ${e.message}`));
+            });
+        }
+        if (detail?.output?.errors) {
+            detail.output.errors.forEach(e => messages.push(e.message));
+        }
+        const msg = messages.length ? messages.join(' | ') : (detail?.message || 'Please complete all required fields and try again.');
+        this.dispatchEvent(new ShowToastEvent({ title: 'Could not save', message: msg, variant: 'error', mode: 'sticky' }));
+    }
 
     checkStep2Done() {
         if (this.oppSaved && this.accSaved) {
@@ -188,12 +215,21 @@ export default class QuoteGenerator extends LightningElement {
             let tGross = 0; let tDisc = 0; let tNet = 0;
             const tableData = [];
 
+            const fmtDesc = t => {
+                if (!t) return '';
+                return t
+                    .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+                    .replace(/(<([^>]+)>)/gi, '')
+                    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
+                    .replace(/\r\n|\r/g, '\n')
+                    .replace(/^[-*]\s+/gm, '\u2022 ').trim();
+            };
+
             dbLines.forEach(rec => {
                 let productName = 'Service Item';
                 if (rec.fields.Product__r?.value?.fields?.Name?.value) productName = rec.fields.Product__r.value.fields.Name.value;
                 else if (rec.fields.Product__c?.displayValue) productName = rec.fields.Product__c.displayValue;
-                let desc = rec.fields.Description__c?.value || '';
-                desc = desc.replace(/(<([^>]+)>)/gi, '').trim();
+                const desc  = fmtDesc(rec.fields.Description__c?.value || '');
                 const q     = parseFloat(rec.fields.Quantity__c?.value) || 0;
                 const p     = parseFloat(rec.fields.Sales_Price__c?.value) || 0;
                 const d     = parseFloat(rec.fields.Discount__c?.value) || 0;
@@ -206,29 +242,43 @@ export default class QuoteGenerator extends LightningElement {
                     `$${p.toFixed(2)}`,
                     `$${net.toFixed(2)}`
                 ]);
-                if (desc) tableData.push([
-                    { content: desc, colSpan: 4, styles: { fontStyle: 'normal', textColor: [40, 40, 40] } }
-                ]);
+                if (desc) {
+                    desc.split('\n').forEach(line => {
+                        if (line.trim()) tableData.push([{ content: line.trim(), colSpan: 4, styles: { fontStyle: 'normal', textColor: [40, 40, 40] } }]);
+                    });
+                }
             });
 
             const tableStartY = Math.max(leftY + 15, rightY + 10);
             doc.autoTable({
                 startY: tableStartY,
                 head: [[
-                    { content: 'Service',    styles: { halign: 'left'  } },
-                    { content: 'Qty',        styles: { halign: 'right' } },
-                    { content: 'Unit Price', styles: { halign: 'right' } },
-                    { content: 'Total',      styles: { halign: 'right' } }
+                    { content: 'Service / Product', styles: { halign: 'left'  } },
+                    { content: 'Qty',               styles: { halign: 'center' } },
+                    { content: 'Unit Price',         styles: { halign: 'right' } },
+                    { content: 'Total',              styles: { halign: 'right' } }
                 ]],
                 body: tableData,
                 theme: 'plain',
-                headStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29], fontStyle: 'bold', lineWidth: { bottom: 1.5 }, lineColor: [212, 175, 55] },
-                bodyStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29] },
-                columnStyles: { 0: { cellWidth: 80 }, 1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' } }
+                headStyles: { fillColor: [212, 175, 55], textColor: [2, 12, 29], fontStyle: 'bold', fontSize: 9 },
+                bodyStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29], fontSize: 9 },
+                columnStyles: {
+                    0: { cellWidth: 92 },
+                    1: { cellWidth: 18, halign: 'center' },
+                    2: { cellWidth: 36, halign: 'right' },
+                    3: { cellWidth: 36, halign: 'right' }
+                },
+                margin: { left: 14, right: 14 }
             });
 
             // Totals
-            const fY = doc.lastAutoTable.finalY;
+            const deposit = parseFloat(this.oppRecordData.Deposit__c?.value || this.oppData?.fields?.Deposit__c?.value || 0);
+            let fY = doc.lastAutoTable.finalY;
+            const totalsNeeded = 50 + (tDisc > 0 ? 7 : 0) + (deposit > 0 ? 7 : 0);
+            if (fY + totalsNeeded > 277) {
+                doc.addPage(); doc.setFillColor(247, 231, 206); doc.rect(0, 0, 210, 297, 'F');
+                doc.setTextColor(2, 12, 29); fY = 15;
+            }
             doc.setDrawColor(212, 175, 55); doc.line(110, fY + 10, 196, fY + 10);
             doc.setFontSize(10); doc.setFont("helvetica", "bold");
             doc.text("Subtotal", 110, fY + 17);
@@ -243,7 +293,6 @@ export default class QuoteGenerator extends LightningElement {
             doc.setFont("helvetica", "bold");
             doc.text("Estimated Total", 110, nextY); doc.text(`$${tNet.toFixed(2)}`, 196, nextY, { align: "right" });
 
-            const deposit = parseFloat(this.oppRecordData.Deposit__c?.value || this.oppData?.fields?.Deposit__c?.value || 0);
             if (deposit > 0) {
                 nextY += 7;
                 doc.setFont("helvetica", "bold"); doc.text("Deposit Required", 110, nextY);
@@ -294,7 +343,11 @@ export default class QuoteGenerator extends LightningElement {
             this.emailSubject    = `Your Quote - ${oppName2}`;
             this.pdfFileName     = `${clientName} - Quote - ${dateStr}.pdf`;
 
-        } catch (e) { console.error('PDF Generation Error:', e); }
+        } catch (e) {
+            console.error('PDF Generation Error:', e);
+            this.isLoading = false;
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not generate PDF', message: 'An error occurred while preparing the document. Please try again.', variant: 'error' }));
+        }
     }
 
     buildQuoteHtml(oppName, eventDate, accName, accEmail, accPhone, street, city, state, zip, dbLines, tGross, tDisc, tNet, deposit) {
@@ -303,10 +356,20 @@ export default class QuoteGenerator extends LightningElement {
 
         const clientAddress = [street, city && state ? `${city}, ${state} ${zip}` : city].filter(Boolean).join('<br/>');
 
+        const fmtDescHtml = t => {
+            if (!t) return '';
+            return t
+                .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+                .replace(/(<([^>]+)>)/gi, '')
+                .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
+                .replace(/\r\n|\r/g, '\n')
+                .replace(/^[-*]\s+/gm, '\u2022 ').trim()
+                .replace(/\n/g, '<br/>');
+        };
+
         const lineItemRows = dbLines.map(rec => {
             const name  = rec.fields.Product__r?.value?.fields?.Name?.value || rec.fields.Product__c?.displayValue || 'Service Item';
-            let   desc  = rec.fields.Description__c?.value || '';
-            desc = desc.replace(/(<([^>]+)>)/gi, '').trim();
+            const desc  = fmtDescHtml(rec.fields.Description__c?.value || '');
             const q     = parseFloat(rec.fields.Quantity__c?.value) || 0;
             const p     = parseFloat(rec.fields.Sales_Price__c?.value) || 0;
             const d     = parseFloat(rec.fields.Discount__c?.value) || 0;
@@ -393,10 +456,10 @@ ${goldLine}
             }));
             this.closeAction();
         } catch (e) {
-            const msg = e?.body?.message || e?.message || JSON.stringify(e);
-            console.error('Send Error:', msg);
+            const msg = e?.body?.message || e?.message || 'Something went wrong. Please try again.';
+            console.error('Send Error:', e);
             this.isLoading = false;
-            this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: msg, variant: 'error' }));
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not send quote', message: msg, variant: 'error', mode: 'sticky' }));
         }
     }
 }

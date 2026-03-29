@@ -1,0 +1,59 @@
+.card-title {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.title-icon {
+    --lwc-colorTextIconDefault: #706e6b;
+}
+
+.loading-wrap {
+    position: relative;
+    height: 40px;
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid #f3f2f2;
+}
+
+.file-item:last-child {
+    border-bottom: none;
+}
+
+.file-icon {
+    flex-shrink: 0;
+}
+
+.file-name {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-date {
+    font-size: 11px;
+    color: #888;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.folder-footer {
+    border-top: 1px solid #e0e0e0;
+    padding-top: 8px;
+    display: flex;
+    align-items: center;
+}

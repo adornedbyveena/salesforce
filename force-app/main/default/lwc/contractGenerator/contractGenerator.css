@@ -4,6 +4,10 @@
     height: 100%;
 }
 
+.line-items-container {
+    overflow: visible;
+}
+
 .slds-modal__content {
     flex: 1 1 auto;
     overflow: visible;

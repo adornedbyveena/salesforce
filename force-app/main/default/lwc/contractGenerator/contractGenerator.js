@@ -1,9 +1,10 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
+import { getRecord, deleteRecord } from 'lightning/uiRecordApi';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 import { loadScript } from 'lightning/platformResourceLoader';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { refreshApex } from '@salesforce/apex';
 import sendContractEmail from '@salesforce/apex/ContractController.sendContractEmail';
 import JSPDF_LIB from '@salesforce/resourceUrl/jsPDF';
 import AUTOTABLE_LIB from '@salesforce/resourceUrl/jsPDFAutoTable';
@@ -25,6 +26,7 @@ export default class ContractGenerator extends LightningElement {
     @api recordId;
     @track currentStep = '1';
     @track isLoading = true;
+    @track rows = [];
     @track pdfUrl;
     @track pdfFileName = 'Contract.pdf';
     @track emailTo = '';
@@ -34,6 +36,7 @@ export default class ContractGenerator extends LightningElement {
 
     accountId; oppData; rawPdfBase64; rawContractHtml;
     jsPdfInitialized = false;
+    saveCount = 0; totalForms = 0;
     oppSaved = false; accSaved = false;
     oppRecordData = {}; accRecordData = {};
     wiredLineItemsResult;
@@ -41,6 +44,7 @@ export default class ContractGenerator extends LightningElement {
     get isStep1() { return this.currentStep === '1'; }
     get isStep2() { return this.currentStep === '2'; }
     get isStep3() { return this.currentStep === '3'; }
+    get isStep4() { return this.currentStep === '4'; }
 
     renderedCallback() {
         if (this.jsPdfInitialized) return;
@@ -66,15 +70,49 @@ export default class ContractGenerator extends LightningElement {
         parentRecordId: '$recordId',
         relatedListId: 'Line_Items__r',
         fields: [
+            'Line_Item__c.Id',
             'Line_Item__c.Product__c',
             'Line_Item__c.Product__r.Name',
             'Line_Item__c.Description__c',
-            'Line_Item__c.Quantity__c'
+            'Line_Item__c.Quantity__c',
+            'Line_Item__c.Sales_Price__c'
         ]
     })
-    wiredLineItems(result) { this.wiredLineItemsResult = result; }
+    wiredLineItems(result) {
+        this.wiredLineItemsResult = result;
+        if (result.data) {
+            this.rows = result.data.records.map(rec => ({ id: rec.id, recordId: rec.id }));
+            if (this.rows.length === 0) this.addRow();
+        }
+    }
+
+    // ── STEP 1: LINE ITEMS ──
+    addRow() { this.rows = [...this.rows, { id: Date.now() + Math.random(), recordId: null }]; }
+
+    removeRow(e) {
+        const id  = e.target.dataset.id;
+        const row = this.rows.find(r => String(r.id) === id);
+        if (row && row.recordId) deleteRecord(row.recordId);
+        this.rows = this.rows.filter(r => String(r.id) !== id);
+    }
 
     saveStep1() {
+        const forms = this.template.querySelectorAll('lightning-record-edit-form');
+        this.totalForms = forms.length; this.saveCount = 0; this.isLoading = true;
+        forms.forEach(f => f.submit());
+    }
+
+    handleLineItemSuccess() {
+        this.saveCount++;
+        if (this.saveCount === this.totalForms) {
+            refreshApex(this.wiredLineItemsResult).then(() => {
+                this.currentStep = '2'; this.isLoading = false;
+            });
+        }
+    }
+
+    // ── STEP 2: EVENT & CLIENT DETAILS ──
+    saveStep2() {
         this.isLoading = true;
         this.oppSaved = false;
         this.accSaved = false;
@@ -82,11 +120,36 @@ export default class ContractGenerator extends LightningElement {
         this.template.querySelector('lightning-record-edit-form[data-id="accForm"]').submit();
     }
 
-    handleOppSuccess(event) { this.oppRecordData = event.detail.fields; this.oppSaved = true; this.checkStep1Completion(); }
-    handleAccSuccess(event) { this.accRecordData = event.detail.fields; this.accSaved = true; this.checkStep1Completion(); }
-    handleFormError(event) { console.error('Form Error:', event.detail); this.isLoading = false; }
+    handleOppSuccess(event) { this.oppRecordData = event.detail.fields; this.oppSaved = true; this.checkStep2Completion(); }
+    handleAccSuccess(event) { this.accRecordData = event.detail.fields; this.accSaved = true; this.checkStep2Completion(); }
+    handleFormError(event) {
+        this.isLoading = false;
+        const FIELD_LABELS = {
+            Product__c: 'Product', Quantity__c: 'Quantity', Sales_Price__c: 'Unit Price',
+            Discount__c: 'Discount', Description__c: 'Description',
+            Name: 'Name', CloseDate: 'Event Date',
+            Total_Amount__c: 'Total Amount', Deposit__c: 'Deposit',
+            Balance_Due__c: 'Balance Due', Deposit_Paid__c: 'Deposit Paid',
+            PersonEmail: 'Email', Phone: 'Phone',
+            BillingStreet: 'Billing Street', BillingCity: 'Billing City',
+            BillingState: 'Billing State', BillingPostalCode: 'Billing Zip'
+        };
+        const detail = event.detail;
+        const messages = [];
+        if (detail?.output?.fieldErrors) {
+            Object.entries(detail.output.fieldErrors).forEach(([field, errs]) => {
+                const label = FIELD_LABELS[field] || field;
+                errs.forEach(e => messages.push(`${label}: ${e.message}`));
+            });
+        }
+        if (detail?.output?.errors) {
+            detail.output.errors.forEach(e => messages.push(e.message));
+        }
+        const msg = messages.length ? messages.join(' | ') : (detail?.message || 'Please complete all required fields and try again.');
+        this.dispatchEvent(new ShowToastEvent({ title: 'Could not save', message: msg, variant: 'error', mode: 'sticky' }));
+    }
 
-    checkStep1Completion() {
+    checkStep2Completion() {
         if (this.oppSaved && this.accSaved) {
             this.generateContractPDF();
         }
@@ -132,7 +195,7 @@ export default class ContractGenerator extends LightningElement {
 
             const newPage = () => {
                 doc.addPage();
-                doc.setFillColor(255, 255, 255);
+                doc.setFillColor(247, 231, 206);
                 doc.rect(0, 0, 210, 297, 'F');
                 doc.setTextColor(2, 12, 29);
                 y = 15;
@@ -140,7 +203,7 @@ export default class ContractGenerator extends LightningElement {
             const chk = (needed = 8) => { if (y + needed > 278) newPage(); };
 
             const goldLine = () => {
-                chk(10);
+                chk(50);
                 doc.setDrawColor(212, 175, 55);
                 doc.setLineWidth(0.6);
                 doc.line(MARGIN, y, 210 - MARGIN, y);
@@ -148,7 +211,7 @@ export default class ContractGenerator extends LightningElement {
             };
 
             const h2 = (text) => {
-                chk(14);
+                chk(35);
                 doc.setFontSize(11);
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(2, 12, 29);
@@ -208,7 +271,7 @@ export default class ContractGenerator extends LightningElement {
             };
 
             // --- PAGE 1 BACKGROUND ---
-            doc.setFillColor(255, 255, 255);
+            doc.setFillColor(247, 231, 206);
             doc.rect(0, 0, 210, 297, 'F');
             doc.setTextColor(2, 12, 29);
 
@@ -239,22 +302,57 @@ export default class ContractGenerator extends LightningElement {
             h3('Event Planning Services');
             body('The Company agrees to provide the following services for the event hosted by the Client:');
 
+            const fmtDesc = t => {
+                if (!t) return '';
+                return t
+                    .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+                    .replace(/(<([^>]+)>)/gi, '')
+                    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
+                    .replace(/\r\n|\r/g, '\n')
+                    .replace(/^[-*]\s+/gm, '\u2022 ').trim();
+            };
+
             const dbLines = this.wiredLineItemsResult?.data?.records || [];
-            const tableData = dbLines.map(rec => {
-                const name = rec.fields.Product__r?.value?.fields?.Name?.value || '';
-                const desc = rec.fields.Description__c?.value || '';
-                const qty  = rec.fields.Quantity__c?.value != null ? String(rec.fields.Quantity__c.value) : '';
-                return [{ content: name, styles: { fontStyle: 'bold' } }, qty, desc];
+            const tableData = [];
+            dbLines.forEach(rec => {
+                const name  = rec.fields.Product__r?.value?.fields?.Name?.value || '';
+                const desc  = fmtDesc(rec.fields.Description__c?.value || '');
+                const qty   = rec.fields.Quantity__c?.value != null ? rec.fields.Quantity__c.value : 0;
+                const price = rec.fields.Sales_Price__c?.value != null ? rec.fields.Sales_Price__c.value : 0;
+                const total = qty * price;
+                tableData.push([
+                    { content: name, styles: { fontStyle: 'bold' } },
+                    { content: String(qty), styles: { halign: 'center' } },
+                    { content: `$${parseFloat(price).toFixed(2)}`, styles: { halign: 'right' } },
+                    { content: `$${total.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
+                ]);
+                if (desc) {
+                    desc.split('\n').forEach(line => {
+                        if (line.trim()) tableData.push([
+                            { content: line.trim(), colSpan: 4, styles: { fontStyle: 'normal', textColor: [80, 80, 80], fontSize: 8.5 } }
+                        ]);
+                    });
+                }
             });
 
             doc.autoTable({
                 startY: y,
-                head: [['Service / Product', 'Qty', 'Description']],
+                head: [[
+                    { content: 'Service / Product', styles: { halign: 'left' } },
+                    { content: 'Qty',               styles: { halign: 'center' } },
+                    { content: 'Unit Price',         styles: { halign: 'right' } },
+                    { content: 'Total',              styles: { halign: 'right' } }
+                ]],
                 body: tableData,
                 theme: 'plain',
                 headStyles: { fillColor: [212, 175, 55], textColor: [2, 12, 29], fontStyle: 'bold', fontSize: 9 },
-                bodyStyles: { fillColor: [255, 255, 255], textColor: [2, 12, 29], fontSize: 9 },
-                columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 18, halign: 'center' }, 2: { cellWidth: 104 } },
+                bodyStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29], fontSize: 9 },
+                columnStyles: {
+                    0: { cellWidth: 92 },
+                    1: { cellWidth: 18, halign: 'center' },
+                    2: { cellWidth: 36, halign: 'right' },
+                    3: { cellWidth: 36, halign: 'right' }
+                },
                 margin: { left: MARGIN, right: MARGIN }
             });
             y = doc.lastAutoTable.finalY + 5;
@@ -268,6 +366,7 @@ export default class ContractGenerator extends LightningElement {
                 'Costs for any services or items not explicitly mentioned in this Agreement.'
             ].forEach(t => bullet(t));
 
+            goldLine();
             // --- EVENT DETAILS ---
             h2('Event Details');
             bullet(`Event Name: ${oppName}`);
@@ -351,6 +450,7 @@ export default class ContractGenerator extends LightningElement {
             goldLine();
 
             // --- SIGNATURE BLOCK ---
+            chk(60);
             h2('Acknowledgement & Acceptance');
             body('By signing below, the parties acknowledge that they have read, understood, and agree to the terms and conditions outlined in this Agreement.');
             y += 10;
@@ -383,14 +483,13 @@ export default class ContractGenerator extends LightningElement {
             this.emailSubject    = `Your Event Contract - ${oppName}`;
 
             this.rawContractHtml = this.buildContractHtml();
-            this.currentStep = '2';
+            this.currentStep = '3';
             this.isLoading = false;
 
         } catch (e) {
-            const msg = e?.body?.message || e?.message || JSON.stringify(e);
-            console.error('PDF Generation Error:', msg);
+            console.error('PDF Generation Error:', e);
             this.isLoading = false;
-            this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: msg, variant: 'error' }));
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not generate PDF', message: 'An error occurred while preparing the document. Please try again.', variant: 'error' }));
         }
     }
 
@@ -423,15 +522,29 @@ export default class ContractGenerator extends LightningElement {
             ? `A non-refundable deposit of $${depAmt} was paid prior to this Agreement.`
             : `A non-refundable deposit of $${depAmt} is due upon signing this Agreement.`;
 
+        const fmtDescHtml = t => {
+            if (!t) return '';
+            return t
+                .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+                .replace(/(<([^>]+)>)/gi, '')
+                .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
+                .replace(/\r\n|\r/g, '\n')
+                .replace(/^[-*]\s+/gm, '\u2022 ').trim()
+                .replace(/\n/g, '<br/>');
+        };
+
         const dbLines = this.wiredLineItemsResult?.data?.records || [];
         const lineItemRows = dbLines.map(rec => {
-            const name = rec.fields.Product__r?.value?.fields?.Name?.value || '';
-            const desc = rec.fields.Description__c?.value || '';
-            const qty  = rec.fields.Quantity__c?.value != null ? String(rec.fields.Quantity__c.value) : '';
+            const name  = rec.fields.Product__r?.value?.fields?.Name?.value || '';
+            const desc  = fmtDescHtml(rec.fields.Description__c?.value || '');
+            const qty   = rec.fields.Quantity__c?.value != null ? rec.fields.Quantity__c.value : 0;
+            const price = rec.fields.Sales_Price__c?.value != null ? rec.fields.Sales_Price__c.value : 0;
+            const total = qty * price;
             return `<tr>
-                    <td class="line-name" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:35%;font-weight:bold;">${name}</td>
-                    <td class="line-qty"  style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:10%;text-align:center;">${qty}</td>
-                    <td class="line-desc" style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:55%;">${desc}</td>
+                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:40%;font-weight:bold;">${name}${desc ? '<br/><span style="font-weight:normal;font-size:9pt;color:#444;">' + desc + '</span>' : ''}</td>
+                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:10%;text-align:center;">${qty}</td>
+                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:25%;text-align:right;">$${parseFloat(price).toFixed(2)}</td>
+                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:25%;text-align:right;font-weight:bold;">$${total.toFixed(2)}</td>
                 </tr>`;
         }).join('');
 
@@ -453,9 +566,10 @@ ${goldLine}
 <table class="line-items-table" style="width:100%;border-collapse:collapse;margin:10px 0 15px 0;">
     <thead>
         <tr>
-            <th class="line-name" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:35%;">Service / Product</th>
-            <th class="line-qty"  style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:center;font-size:9pt;width:10%;">Qty</th>
-            <th class="line-desc" style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:55%;">Description</th>
+            <th style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:left;font-size:9pt;width:40%;">Service / Product</th>
+            <th style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:center;font-size:9pt;width:10%;">Qty</th>
+            <th style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:right;font-size:9pt;width:25%;">Unit Price</th>
+            <th style="background-color:#D4AF37;color:#020C1D;font-weight:bold;padding:8px;text-align:right;font-size:9pt;width:25%;">Total</th>
         </tr>
     </thead>
     <tbody>
@@ -473,6 +587,8 @@ ${goldLine}
     <li>Insurance for the event (Client will need to secure separate insurance coverage).</li>
     <li>Costs for any services or items not explicitly mentioned in this Agreement.</li>
 </ul>
+
+${goldLine}
 
 <div class="avoid-break">
     <h2>Event Details</h2>
@@ -614,11 +730,12 @@ ${goldLine}
     }
 
     goBack() {
-        if (this.currentStep === '3') { this.currentStep = '2'; }
-        else if (this.currentStep === '2') { this.currentStep = '1'; this.pdfUrl = null; this.rawPdfBase64 = null; }
+        if (this.currentStep === '4') { this.currentStep = '3'; }
+        else if (this.currentStep === '3') { this.currentStep = '2'; this.pdfUrl = null; this.rawPdfBase64 = null; }
+        else if (this.currentStep === '2') { this.currentStep = '1'; }
     }
 
-    previewEmail() { this.currentStep = '3'; }
+    previewEmail() { this.currentStep = '4'; }
 
     closeAction() { this.dispatchEvent(new CloseActionScreenEvent()); }
 
@@ -638,10 +755,10 @@ ${goldLine}
             }));
             this.closeAction();
         } catch (e) {
-            const msg = e?.body?.message || e?.message || JSON.stringify(e);
-            console.error('Send Error:', msg);
+            const msg = e?.body?.message || e?.message || 'Something went wrong. Please try again.';
+            console.error('Send Error:', e);
             this.isLoading = false;
-            this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: msg, variant: 'error' }));
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not send contract', message: msg, variant: 'error', mode: 'sticky' }));
         }
     }
 }

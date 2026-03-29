@@ -1,0 +1,119 @@
+<template>
+    <lightning-card icon-name="utility:location">
+        <span slot="title" class="card-title">Venue</span>
+
+        <div class="slds-p-around_medium">
+
+            <!-- Web form suggestion banner -->
+            <template if:true={showWebFormSuggestion}>
+                <div class="web-form-banner slds-m-bottom_medium">
+                    <lightning-icon icon-name="utility:info" size="xx-small" variant="warning" class="slds-m-right_xx-small"></lightning-icon>
+                    <span class="web-form-label">From web form: </span>
+                    <span class="web-form-text">{webFormVenue}</span>
+                    <lightning-button
+                        label="Auto-fill"
+                        variant="base"
+                        onclick={geocodeWebFormAddress}
+                        disabled={isGeocoding}
+                        class="slds-m-left_x-small">
+                    </lightning-button>
+                    <template if:true={isGeocoding}>
+                        <lightning-spinner size="small" alternative-text="Geocoding..."></lightning-spinner>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Venue details + photo gallery -->
+            <template if:true={hasVenue}>
+
+                <!-- Place name, address, rating -->
+                <div class="venue-header slds-m-bottom_small">
+                    <button class="clear-venue-btn" onclick={handleClearVenue} title="Clear venue">✕ Clear</button>
+                    <template if:true={showVenueName}>
+                        <p class="venue-name">{venuePlaceName}</p>
+                    </template>
+                    <a href={mapsUrl} target="_blank" rel="noopener noreferrer" class="venue-address-link">
+                        <p class="venue-address">{venueStreet}</p>
+                        <p class="venue-address">{venueCityStateZip}</p>
+                    </a>
+                    <template if:true={venueMeta}>
+                        <p class="venue-meta">{venueMeta}</p>
+                    </template>
+                    <div class="venue-footer slds-m-top_x-small">
+                        <template if:true={distanceText}>
+                            <p class="venue-distance">📍 {distanceText} from office</p>
+                        </template>
+                        <lightning-button
+                            label="Directions"
+                            icon-name="utility:location"
+                            variant="neutral"
+                            onclick={openDirections}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <!-- Street View -->
+                <template if:true={hasStreetView}>
+                    <div class="street-view-wrap slds-m-bottom_medium">
+                        <img src={streetViewUrl} alt="Street view" class="street-view-img" />
+                    </div>
+                </template>
+
+                <div class="divider slds-m-bottom_small"></div>
+            </template>
+
+            <!-- Search input + suggestions dropdown -->
+            <div class="slds-form-element slds-is-relative">
+                <label class="slds-form-element__label">
+                    <template if:true={hasVenue}>Update Venue</template>
+                    <template if:false={hasVenue}>Search for Venue</template>
+                </label>
+                <div class="slds-form-element__control">
+                    <input
+                        type="text"
+                        class="slds-input venue-autocomplete-input"
+                        placeholder={inputPlaceholder}
+                        autocomplete="off"
+                        oninput={handleInput}
+                        onblur={handleBlur}
+                    />
+                </div>
+
+                <!-- Saving spinner -->
+                <template if:true={isSaving}>
+                    <div class="slds-m-top_xx-small" style="display:flex;align-items:center;height:32px;position:relative;">
+                        <lightning-spinner size="small" alternative-text="Saving venue..."></lightning-spinner>
+                        <span class="slds-m-left_large" style="font-size:12px;color:#888;">Saving venue...</span>
+                    </div>
+                </template>
+
+                <!-- Custom suggestions dropdown -->
+                <template if:true={hasSuggestions}>
+                    <div class="suggestions-dropdown">
+                        <template for:each={suggestions} for:item="s">
+                            <div
+                                key={s.id}
+                                class="suggestion-item"
+                                data-place-id={s.placeId}
+                                data-description={s.description}
+                                onmousedown={selectSuggestion}>
+                                <span class="suggestion-main">{s.mainText}</span>
+                                <span class="suggestion-secondary">{s.secondaryText}</span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Status / error messages -->
+            <template if:true={statusMessage}>
+                <p class="status-success slds-m-top_xx-small">{statusMessage}</p>
+            </template>
+            <template if:true={errorMessage}>
+                <p class="status-error slds-m-top_xx-small">{errorMessage}</p>
+            </template>
+
+
+        </div>
+    </lightning-card>
+</template>

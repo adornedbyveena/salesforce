@@ -111,7 +111,32 @@ export default class InvoiceGenerator extends LightningElement {
     }
     handleOppSuccess(event) { this.oppRecordData = event.detail.fields; this.oppSaved = true; this.checkStep2Completion(); }
     handleAccSuccess(event) { this.accRecordData = event.detail.fields; this.accSaved = true; this.checkStep2Completion(); }
-    handleFormError(event) { console.error('Form Error:', event.detail); this.isLoading = false; }
+    handleFormError(event) {
+        this.isLoading = false;
+        const FIELD_LABELS = {
+            Product__c: 'Product', Quantity__c: 'Quantity', Sales_Price__c: 'Unit Price',
+            Discount__c: 'Discount', Description__c: 'Description',
+            Name: 'Name', CloseDate: 'Event Date',
+            Total_Amount__c: 'Total Amount', Deposit__c: 'Deposit',
+            Balance_Due__c: 'Balance Due', Deposit_Paid__c: 'Deposit Paid',
+            PersonEmail: 'Email', PersonMobilePhone: 'Mobile Phone',
+            BillingStreet: 'Billing Street', BillingCity: 'Billing City',
+            BillingState: 'Billing State', BillingPostalCode: 'Billing Zip'
+        };
+        const detail = event.detail;
+        const messages = [];
+        if (detail?.output?.fieldErrors) {
+            Object.entries(detail.output.fieldErrors).forEach(([field, errs]) => {
+                const label = FIELD_LABELS[field] || field;
+                errs.forEach(e => messages.push(`${label}: ${e.message}`));
+            });
+        }
+        if (detail?.output?.errors) {
+            detail.output.errors.forEach(e => messages.push(e.message));
+        }
+        const msg = messages.length ? messages.join(' | ') : (detail?.message || 'Please complete all required fields and try again.');
+        this.dispatchEvent(new ShowToastEvent({ title: 'Could not save', message: msg, variant: 'error', mode: 'sticky' }));
+    }
 
     checkStep2Completion() {
         if (this.oppSaved && this.accSaved) {
@@ -247,18 +272,31 @@ export default class InvoiceGenerator extends LightningElement {
             let tDisc = 0; let tNet = 0;
             const tableData = [];
 
+            const fmtDesc = t => {
+                if (!t) return '';
+                return t
+                    .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+                    .replace(/(<([^>]+)>)/gi, '')
+                    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
+                    .replace(/\r\n|\r/g, '\n')
+                    .replace(/^[-*]\s+/gm, '\u2022 ').trim();
+            };
+
             dbLines.forEach(rec => {
                 let productName = 'Service Item';
                 if (rec.fields.Product__r?.value?.fields?.Name?.value) productName = rec.fields.Product__r.value.fields.Name.value;
                 else if (rec.fields.Product__c?.displayValue) productName = rec.fields.Product__c.displayValue;
-                let desc = rec.fields.Description__c?.value || '';
-                desc = desc.replace(/(<([^>]+)>)/gi, "").trim();
+                const desc = fmtDesc(rec.fields.Description__c?.value || '');
                 const q = parseFloat(rec.fields.Quantity__c?.value) || 0;
                 const p = parseFloat(rec.fields.Sales_Price__c?.value) || 0;
                 const d = parseFloat(rec.fields.Discount__c?.value) || 0;
                 const r = (q * p) - d; tDisc += d; tNet += r;
                 tableData.push([ { content: productName, styles: { fontStyle: 'bold' } }, q, `$${r.toFixed(2)}` ]);
-                if (desc) tableData.push([ { content: desc, styles: { fontStyle: 'normal', textColor: [40, 40, 40] } }, '', '' ]);
+                if (desc) {
+                    desc.split('\n').forEach(line => {
+                        if (line.trim()) tableData.push([{ content: line.trim(), colSpan: 3, styles: { fontStyle: 'normal', textColor: [40, 40, 40] } }]);
+                    });
+                }
             });
 
             const tableStartY = Math.max(leftY + 15, rightY + 10);
@@ -268,10 +306,15 @@ export default class InvoiceGenerator extends LightningElement {
                 body: tableData, theme: 'plain',
                 headStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29], fontStyle: 'bold', lineWidth: { bottom: 1.5 }, lineColor: [212, 175, 55] },
                 bodyStyles: { fillColor: [247, 231, 206], textColor: [2, 12, 29] },
-                columnStyles: { 0: { cellWidth: 90 }, 1: { halign: 'right' }, 2: { halign: 'right' } }
+                columnStyles: { 0: { cellWidth: 110 }, 1: { cellWidth: 36, halign: 'right' }, 2: { cellWidth: 36, halign: 'right' } },
+                margin: { left: 14, right: 14 }
             });
 
-            const fY = doc.lastAutoTable.finalY;
+            let fY = doc.lastAutoTable.finalY;
+            if (fY + 65 > 277) {
+                doc.addPage(); doc.setFillColor(247, 231, 206); doc.rect(0, 0, 210, 297, 'F');
+                doc.setTextColor(2, 12, 29); fY = 15;
+            }
             doc.setTextColor(2, 12, 29); doc.setDrawColor(212, 175, 55); doc.line(110, fY + 10, 196, fY + 10);
             doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.text("Subtotal", 110, fY + 17);
             doc.setFont("helvetica", "normal"); doc.text(`$${(tNet + tDisc).toFixed(2)}`, 196, fY + 17, { align: "right" });
@@ -349,7 +392,11 @@ export default class InvoiceGenerator extends LightningElement {
             this.emailSubject    = `Your Invoice - ${oppName2}`;
             this.pdfFileName     = `${clientName} - Invoice - ${dateStr}.pdf`;
 
-        } catch (e) { console.error('PDF Generation Error:', e); }
+        } catch (e) {
+            console.error('PDF Generation Error:', e);
+            this.isLoading = false;
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not generate PDF', message: 'An error occurred while preparing the document. Please try again.', variant: 'error' }));
+        }
     }
 
     // --- NAVIGATION ---
@@ -379,10 +426,10 @@ export default class InvoiceGenerator extends LightningElement {
             }));
             this.closeAction();
         } catch (e) {
-            const msg = e?.body?.message || e?.message || JSON.stringify(e);
-            console.error('Send Error:', msg);
+            const msg = e?.body?.message || e?.message || 'Something went wrong. Please try again.';
+            console.error('Send Error:', e);
             this.isLoading = false;
-            this.dispatchEvent(new ShowToastEvent({ title: 'Error', message: msg, variant: 'error' }));
+            this.dispatchEvent(new ShowToastEvent({ title: 'Could not send invoice', message: msg, variant: 'error', mode: 'sticky' }));
         }
     }
 }
