@@ -4,6 +4,6 @@
     <encodingKey>UTF-8</encodingKey>
     <name>ABV Lead Thank You</name>
     <style>none</style>
-    <subject>We received your inquiry – {!EventName}</subject>
+    <subject>We received your inquiry - {!EventName}</subject>
     <type>custom</type>
 </EmailTemplate>

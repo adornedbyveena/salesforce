@@ -4,6 +4,6 @@
     <encodingKey>UTF-8</encodingKey>
     <name>ABV Invoice Ready</name>
     <style>none</style>
-    <subject>Your Invoice – {!EventName}</subject>
+    <subject>Your Invoice - {!EventName}</subject>
     <type>custom</type>
 </EmailTemplate>

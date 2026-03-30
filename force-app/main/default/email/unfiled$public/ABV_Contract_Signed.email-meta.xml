@@ -4,6 +4,6 @@
     <encodingKey>UTF-8</encodingKey>
     <name>ABV Contract Signed</name>
     <style>none</style>
-    <subject>Contract Signed – {!EventName}</subject>
+    <subject>Contract Signed - {!EventName}</subject>
     <type>custom</type>
 </EmailTemplate>

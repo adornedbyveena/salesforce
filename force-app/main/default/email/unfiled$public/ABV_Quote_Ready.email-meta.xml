@@ -4,6 +4,6 @@
     <encodingKey>UTF-8</encodingKey>
     <name>ABV Quote Ready</name>
     <style>none</style>
-    <subject>Your Quote – {!EventName}</subject>
+    <subject>Your Quote - {!EventName}</subject>
     <type>custom</type>
 </EmailTemplate>

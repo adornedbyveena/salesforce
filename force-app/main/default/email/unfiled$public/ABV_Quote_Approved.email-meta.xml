@@ -4,6 +4,6 @@
     <encodingKey>UTF-8</encodingKey>
     <name>ABV Quote Approved</name>
     <style>none</style>
-    <subject>Quote Approved – {!EventName}</subject>
+    <subject>Quote Approved - {!EventName}</subject>
     <type>custom</type>
 </EmailTemplate>

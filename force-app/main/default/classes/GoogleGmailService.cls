@@ -19,14 +19,14 @@ public class GoogleGmailService {
     // Fetches an EmailTemplate by DeveloperName and substitutes {!VarName} placeholders.
     private static String[] renderTemplate(String developerName, Map<String, String> vars) {
         EmailTemplate tmpl = [
-            SELECT Subject, HtmlValue
+            SELECT Subject, HtmlValue, Body
             FROM EmailTemplate
             WHERE DeveloperName = :developerName
             LIMIT 1
         ];
 
         String subject = tmpl.Subject;
-        String html    = tmpl.HtmlValue;
+        String html    = String.isNotBlank(tmpl.HtmlValue) ? tmpl.HtmlValue : tmpl.Body;
 
         for (String key : vars.keySet()) {
             String val = vars.get(key) != null ? vars.get(key) : '';
