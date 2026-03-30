@@ -1,0 +1,23 @@
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
+  <div style="background:#D4AF37;padding:24px;text-align:center;">
+    <h2 style="color:#fff;margin:0;letter-spacing:3px;font-size:20px;">ADORNED BY VEENA</h2>
+  </div>
+  <div style="padding:32px 36px;">
+    <p>Dear {!ClientName},</p>
+    <p>Your Event Planning &amp; Décor Contract for <strong>{!EventName}</strong> is ready for your review and signature.</p>
+    <p>Please click the button below to view and sign your contract:</p>
+    <p style="text-align:center;margin:32px 0;">
+      <a href="{!ActionUrl}" style="background:#D4AF37;color:#fff;padding:14px 32px;text-decoration:none;font-weight:bold;font-size:15px;border-radius:4px;">Review &amp; Sign Contract</a>
+    </p>
+    <p style="font-size:12px;color:#999;text-align:center;">If the button does not work, copy and paste this link into your browser:<br/><a href="{!ActionUrl}" style="color:#C9A035;">{!ActionUrl}</a></p>
+    <div style="border-top:1px solid #e8d9c0;margin-top:36px;padding-top:24px;text-align:center;">
+      <img src="https://adornedbyveena.com/wp-content/uploads/2026/02/LogoPNG-01-150x150.png" width="72" height="72" alt="Adorned by Veena" style="display:block;margin:0 auto 12px;border-radius:50%;"/>
+      <p style="margin:0 0 2px;font-weight:bold;font-size:15px;color:#2c2c2c;">Veena Boppana</p>
+      <p style="margin:0 0 10px;font-style:italic;color:#C9A035;font-size:13px;">Founder &amp; Principal Designer</p>
+      <p style="margin:0 0 14px;font-size:12px;color:#555;">w&#160;<a href="https://adornedbyveena.com" style="color:#C9A035;text-decoration:none;">adornedbyveena.com</a>&#160;&#160;|&#160;&#160;e&#160;<a href="mailto:veena@adornedbyveena.com" style="color:#C9A035;text-decoration:none;">veena@adornedbyveena.com</a></p>
+      <div style="border-top:1px solid #e8d9c0;margin:0 auto 14px;width:80%;"></div>
+      <p style="margin:0 0 12px;font-size:11px;color:#aaa;letter-spacing:2px;">ARTISTRY IN PLANNING &#8226; ELEGANCE IN DETAIL</p>
+      <p style="margin:0;font-size:12px;"><a href="https://www.instagram.com/adorned_by_veena/" style="color:#C9A035;text-decoration:none;">Instagram</a>&#160;&#160;/&#160;&#160;<a href="https://www.facebook.com/p/Adorned-by-Veena-100062665519080/" style="color:#C9A035;text-decoration:none;">Facebook</a>&#160;&#160;/&#160;&#160;<a href="https://adornedbyveena.com/gallery/" style="color:#C9A035;text-decoration:none;">Portfolio</a></p>
+    </div>
+  </div>
+</div>
