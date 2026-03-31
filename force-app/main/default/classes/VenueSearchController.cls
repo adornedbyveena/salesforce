@@ -1,6 +1,15 @@
 public with sharing class VenueSearchController {
 
-    private static final String KEY    = 'AIzaSyAOxiaHz5eFvX56W8dd3UMCxgte9fkJbNo';
+    private static String KEY {
+        get {
+            if (KEY == null) {
+                ABV_Settings__mdt s = ABV_Settings__mdt.getInstance('Google_Maps_API_Key');
+                KEY = s != null ? s.Value__c : '';
+            }
+            return KEY;
+        }
+        set;
+    }
     private static final String AC_URL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
     private static final String DT_URL = 'https://maps.googleapis.com/maps/api/place/details/json';
 
