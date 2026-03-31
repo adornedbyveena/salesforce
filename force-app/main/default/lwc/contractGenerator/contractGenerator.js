@@ -19,7 +19,11 @@ const OPPORTUNITY_FIELDS = [
     'Opportunity.AccountId',
     'Opportunity.CloseDate',
     'Opportunity.Client_Name_Formula__c',
-    'Opportunity.Client_Email__c'
+    'Opportunity.Client_Email__c',
+    'Opportunity.Venue__Street__s',
+    'Opportunity.Venue__City__s',
+    'Opportunity.Venue__StateCode__s',
+    'Opportunity.Venue__PostalCode__s'
 ];
 
 export default class ContractGenerator extends LightningElement {
@@ -165,10 +169,10 @@ export default class ContractGenerator extends LightningElement {
             const isDepositPaid = this.oppRecordData.Deposit_Paid__c?.value   ?? this.oppData?.fields?.Deposit_Paid__c?.value   ?? false;
             const eventDateRaw  = this.oppRecordData.CloseDate?.value         || this.oppData?.fields?.CloseDate?.value         || '';
 
-            const billingStreet = this.accRecordData.BillingStreet?.value     || '';
-            const billingCity   = this.accRecordData.BillingCity?.value       || '';
-            const billingState  = this.accRecordData.BillingState?.value      || '';
-            const billingZip    = this.accRecordData.BillingPostalCode?.value || '';
+            const billingStreet = this.oppData?.fields?.Venue__Street__s?.value    || '';
+            const billingCity   = this.oppData?.fields?.Venue__City__s?.value      || '';
+            const billingState  = this.oppData?.fields?.Venue__StateCode__s?.value || '';
+            const billingZip    = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
 
             const formulaName  = this.oppData?.fields?.Client_Name_Formula__c?.value;
             const firstName    = this.accRecordData.FirstName?.value || '';

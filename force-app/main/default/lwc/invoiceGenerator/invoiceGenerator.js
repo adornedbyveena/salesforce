@@ -20,7 +20,11 @@ const OPPORTUNITY_FIELDS = [
     'Opportunity.Account.Name',
     'Opportunity.CloseDate',
     'Opportunity.Client_Name_Formula__c',
-    'Opportunity.Client_Email__c'
+    'Opportunity.Client_Email__c',
+    'Opportunity.Venue__Street__s',
+    'Opportunity.Venue__City__s',
+    'Opportunity.Venue__StateCode__s',
+    'Opportunity.Venue__PostalCode__s'
 ];
 
 export default class InvoiceGenerator extends LightningElement {
@@ -252,10 +256,10 @@ export default class InvoiceGenerator extends LightningElement {
             const accName = this.accRecordData.Name?.value || this.oppData?.fields?.Account?.value?.fields?.Name?.value || '';
             const accEmail = this.accRecordData.PersonEmail?.value || this.accRecordData.Email?.value || '';
             const accPhone = this.accRecordData.PersonMobilePhone?.value || this.accRecordData.Phone?.value || '';
-            const street = this.accRecordData.BillingStreet?.value || '';
-            const city = this.accRecordData.BillingCity?.value || '';
-            const state = this.accRecordData.BillingState?.value || '';
-            const zip = this.accRecordData.BillingPostalCode?.value || '';
+            const street = this.oppData?.fields?.Venue__Street__s?.value    || '';
+            const city   = this.oppData?.fields?.Venue__City__s?.value      || '';
+            const state  = this.oppData?.fields?.Venue__StateCode__s?.value || '';
+            const zip    = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
 
             if (accName) doc.text(accName, clientAreaX, leftY);
 

@@ -23,7 +23,11 @@ const OPPORTUNITY_FIELDS = [
     'Opportunity.Balance_Due__c',
     'Opportunity.Deposit_Paid__c',
     'Opportunity.Client_Name_Formula__c',
-    'Opportunity.Client_Email__c'
+    'Opportunity.Client_Email__c',
+    'Opportunity.Venue__Street__s',
+    'Opportunity.Venue__City__s',
+    'Opportunity.Venue__StateCode__s',
+    'Opportunity.Venue__PostalCode__s'
 ];
 
 export default class QuoteGenerator extends LightningElement {
@@ -193,10 +197,10 @@ export default class QuoteGenerator extends LightningElement {
             const accName  = this.accRecordData.Name?.value || this.oppData?.fields?.Account?.value?.fields?.Name?.value || '';
             const accEmail = this.accRecordData.PersonEmail?.value || '';
             const accPhone = this.accRecordData.Phone?.value || this.accRecordData.PersonMobilePhone?.value || '';
-            const street   = this.accRecordData.BillingStreet?.value || '';
-            const city     = this.accRecordData.BillingCity?.value || '';
-            const state    = this.accRecordData.BillingState?.value || '';
-            const zip      = this.accRecordData.BillingPostalCode?.value || '';
+            const street   = this.oppData?.fields?.Venue__Street__s?.value || '';
+            const city     = this.oppData?.fields?.Venue__City__s?.value || '';
+            const state    = this.oppData?.fields?.Venue__StateCode__s?.value || '';
+            const zip      = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
 
             if (accName) doc.text(accName, clientAreaX, leftY);
             leftY += 5; doc.setFont("helvetica", "normal");
@@ -400,7 +404,7 @@ ${goldLine}
     ${accName   ? `<tr><td style="font-weight:bold;padding:4px 0;">Client:</td><td>${accName}</td></tr>` : ''}
     ${accEmail  ? `<tr><td style="font-weight:bold;padding:4px 0;">Email:</td><td>${accEmail}</td></tr>` : ''}
     ${accPhone  ? `<tr><td style="font-weight:bold;padding:4px 0;">Phone:</td><td>${accPhone}</td></tr>` : ''}
-    ${clientAddress ? `<tr><td style="font-weight:bold;padding:4px 0;vertical-align:top;">Address:</td><td>${clientAddress}</td></tr>` : ''}
+    ${clientAddress ? `<tr><td style="font-weight:bold;padding:4px 0;vertical-align:top;">Event Location:</td><td>${clientAddress}</td></tr>` : ''}
     <tr><td style="font-weight:bold;padding:4px 0;">Quote Date:</td><td>${quoteDate}</td></tr>
 </table>
 </div>
