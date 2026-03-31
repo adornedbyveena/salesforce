@@ -276,31 +276,35 @@ export default class InvoiceGenerator extends LightningElement {
             let tDisc = 0; let tNet = 0;
             const tableData = [];
 
-            const fmtDesc = t => {
-                if (!t) return '';
-                return t
-                    .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+            const parseDescForPdf = html => {
+                if (!html) return [];
+                const processed = html
+                    .replace(/<(strong|b)[^>]*>([\s\S]*?)<\/(strong|b)>/gi, (_, _t, inner) =>
+                        '\x01' + inner.replace(/(<([^>]+)>)/gi, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim() + '\x01')
+                    .replace(/<li[^>]*>/gi, '\n\u2022 ').replace(/<\/li>/gi, '')
+                    .replace(/<\/p>/gi, '\n').replace(/<\/div>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
                     .replace(/(<([^>]+)>)/gi, '')
                     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
-                    .replace(/\r\n|\r/g, '\n')
-                    .replace(/^[-*]\s+/gm, '\u2022 ').trim();
+                    .replace(/\r\n|\r/g, '\n');
+                return processed.split('\n')
+                    .map(line => line.trim()).filter(line => line.length > 0)
+                    .map(line => ({ text: line.replace(/\x01/g, '').trim(), bold: line.includes('\x01') }))
+                    .filter(item => item.text.length > 0);
             };
 
             dbLines.forEach(rec => {
                 let productName = 'Service Item';
                 if (rec.fields.Product__r?.value?.fields?.Name?.value) productName = rec.fields.Product__r.value.fields.Name.value;
                 else if (rec.fields.Product__c?.displayValue) productName = rec.fields.Product__c.displayValue;
-                const desc = fmtDesc(rec.fields.Description__c?.value || '');
+                const descItems = parseDescForPdf(rec.fields.Description__c?.value || '');
                 const q = parseFloat(rec.fields.Quantity__c?.value) || 0;
                 const p = parseFloat(rec.fields.Sales_Price__c?.value) || 0;
                 const d = parseFloat(rec.fields.Discount__c?.value) || 0;
                 const r = (q * p) - d; tDisc += d; tNet += r;
                 tableData.push([ { content: productName, styles: { fontStyle: 'bold' } }, q, `$${r.toFixed(2)}` ]);
-                if (desc) {
-                    desc.split('\n').forEach(line => {
-                        if (line.trim()) tableData.push([{ content: line.trim(), colSpan: 3, styles: { fontStyle: 'normal', textColor: [40, 40, 40] } }]);
-                    });
-                }
+                descItems.forEach(item => {
+                    tableData.push([{ content: item.text, colSpan: 3, styles: { fontStyle: item.bold ? 'bold' : 'normal', textColor: [40, 40, 40] } }]);
+                });
             });
 
             const tableStartY = Math.max(leftY + 15, rightY + 10);

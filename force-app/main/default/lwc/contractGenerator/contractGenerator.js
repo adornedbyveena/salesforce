@@ -311,21 +311,27 @@ export default class ContractGenerator extends LightningElement {
             h3('Event Planning Services');
             body('The Company agrees to provide the following services for the event hosted by the Client:');
 
-            const fmtDesc = t => {
-                if (!t) return '';
-                return t
-                    .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
+            const parseDescForPdf = html => {
+                if (!html) return [];
+                const processed = html
+                    .replace(/<(strong|b)[^>]*>([\s\S]*?)<\/(strong|b)>/gi, (_, _t, inner) =>
+                        '\x01' + inner.replace(/(<([^>]+)>)/gi, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim() + '\x01')
+                    .replace(/<li[^>]*>/gi, '\n\u2022 ').replace(/<\/li>/gi, '')
+                    .replace(/<\/p>/gi, '\n').replace(/<\/div>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
                     .replace(/(<([^>]+)>)/gi, '')
                     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
-                    .replace(/\r\n|\r/g, '\n')
-                    .replace(/^[-*]\s+/gm, '\u2022 ').trim();
+                    .replace(/\r\n|\r/g, '\n');
+                return processed.split('\n')
+                    .map(line => line.trim()).filter(line => line.length > 0)
+                    .map(line => ({ text: line.replace(/\x01/g, '').trim(), bold: line.includes('\x01') }))
+                    .filter(item => item.text.length > 0);
             };
 
             const dbLines = this.wiredLineItemsResult?.data?.records || [];
             const tableData = [];
             dbLines.forEach(rec => {
                 const name  = rec.fields.Product__r?.value?.fields?.Name?.value || '';
-                const desc  = fmtDesc(rec.fields.Description__c?.value || '');
+                const descItems = parseDescForPdf(rec.fields.Description__c?.value || '');
                 const qty   = rec.fields.Quantity__c?.value != null ? rec.fields.Quantity__c.value : 0;
                 const price = rec.fields.Sales_Price__c?.value != null ? rec.fields.Sales_Price__c.value : 0;
                 const total = qty * price;
@@ -335,13 +341,9 @@ export default class ContractGenerator extends LightningElement {
                     { content: `$${parseFloat(price).toFixed(2)}`, styles: { halign: 'right' } },
                     { content: `$${total.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
                 ]);
-                if (desc) {
-                    desc.split('\n').forEach(line => {
-                        if (line.trim()) tableData.push([
-                            { content: line.trim(), colSpan: 4, styles: { fontStyle: 'normal', textColor: [80, 80, 80], fontSize: 8.5 } }
-                        ]);
-                    });
-                }
+                descItems.forEach(item => {
+                    tableData.push([{ content: item.text, colSpan: 4, styles: { fontStyle: item.bold ? 'bold' : 'normal', textColor: [80, 80, 80], fontSize: 8.5 } }]);
+                });
             });
 
             doc.autoTable({
@@ -536,16 +538,7 @@ export default class ContractGenerator extends LightningElement {
             ? `A non-refundable deposit of $${depAmt} was paid prior to this Agreement.`
             : `A non-refundable deposit of $${depAmt} is due upon signing this Agreement.`;
 
-        const fmtDescHtml = t => {
-            if (!t) return '';
-            return t
-                .replace(/<\/p>/gi, '\n').replace(/<\/li>/gi, '\n').replace(/<br\s*\/?>/gi, '\n')
-                .replace(/(<([^>]+)>)/gi, '')
-                .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&#10;/g, '\n')
-                .replace(/\r\n|\r/g, '\n')
-                .replace(/^[-*]\s+/gm, '\u2022 ').trim()
-                .replace(/\n/g, '<br/>');
-        };
+        const fmtDescHtml = t => t || '';
 
         const dbLines = this.wiredLineItemsResult?.data?.records || [];
         const lineItemRows = dbLines.map(rec => {
