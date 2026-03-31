@@ -47,11 +47,12 @@ export default class VenueSearch extends LightningElement {
     @track suggestions     = [];
     @track distanceText    = '';
 
-    venueData    = {};
-    webFormVenue = '';
-    placeId      = null;
-    _venueLat    = null;
-    _venueLng    = null;
+    venueData      = {};
+    webFormVenue   = '';
+    placeId        = null;
+    _venueLat      = null;
+    _venueLng      = null;
+    _debounceTimer = null;
 
     // ── Wire: Opportunity ──
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
@@ -105,9 +106,14 @@ export default class VenueSearch extends LightningElement {
 
         if (!query || query.length < 3) {
             this.suggestions = [];
+            clearTimeout(this._debounceTimer);
             return;
         }
-        this.fetchSuggestions(query);
+
+        clearTimeout(this._debounceTimer);
+        this._debounceTimer = setTimeout(() => {
+            this.fetchSuggestions(query);
+        }, 300);
     }
 
     handleBlur() {
