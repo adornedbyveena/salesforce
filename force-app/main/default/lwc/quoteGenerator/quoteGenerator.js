@@ -52,6 +52,12 @@ export default class QuoteGenerator extends LightningElement {
     get isStep3() { return this.currentStep === '3'; }
     get isStep4() { return this.currentStep === '4'; }
 
+    get venueStreet()     { return this.oppData?.fields?.Venue__Street__s?.value    || ''; }
+    get venueCity()       { return this.oppData?.fields?.Venue__City__s?.value      || ''; }
+    get venueState()      { return this.oppData?.fields?.Venue__StateCode__s?.value || ''; }
+    get venuePostalCode() { return this.oppData?.fields?.Venue__PostalCode__s?.value || ''; }
+    get hasVenueAddress() { return !!(this.venueStreet || this.venueCity); }
+
     renderedCallback() {
         if (this.jsPdfInitialized) return;
         this.jsPdfInitialized = true;

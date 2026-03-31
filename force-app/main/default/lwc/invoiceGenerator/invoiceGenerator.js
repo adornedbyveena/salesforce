@@ -1,5 +1,5 @@
 import { LightningElement, api, wire, track } from 'lwc';
-import { updateRecord, createRecord, deleteRecord } from 'lightning/uiRecordApi';
+import { deleteRecord } from 'lightning/uiRecordApi';
 import { getRelatedListRecords } from 'lightning/uiRelatedListApi';
 import { getRecord } from 'lightning/uiRecordApi';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
@@ -51,6 +51,12 @@ export default class InvoiceGenerator extends LightningElement {
     get isStep3() { return this.currentStep === '3'; }
     get isStep4() { return this.currentStep === '4'; }
     get isStep5() { return this.currentStep === '5'; }
+
+    get venueStreet()     { return this.oppData?.fields?.Venue__Street__s?.value    || ''; }
+    get venueCity()       { return this.oppData?.fields?.Venue__City__s?.value      || ''; }
+    get venueState()      { return this.oppData?.fields?.Venue__StateCode__s?.value || ''; }
+    get venuePostalCode() { return this.oppData?.fields?.Venue__PostalCode__s?.value || ''; }
+    get hasVenueAddress() { return !!(this.venueStreet || this.venueCity); }
 
     renderedCallback() {
         if (this.jsPdfInitialized) return;

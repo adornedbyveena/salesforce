@@ -60,7 +60,22 @@
                             <lightning-input-field field-name="Deposit__c"></lightning-input-field>
                             <lightning-input-field field-name="Balance_Due__c"></lightning-input-field>
                             <lightning-input-field field-name="Deposit_Paid__c"></lightning-input-field>
-                            <lightning-input-field field-name="Venue__c"></lightning-input-field>
+                            <div class="slds-form-element slds-m-top_x-small">
+                                <label class="slds-form-element__label">Venue</label>
+                                <div class="slds-form-element__control slds-p-top_xx-small">
+                                    <template if:true={hasVenueAddress}>
+                                        <lightning-formatted-address
+                                            street={venueStreet}
+                                            city={venueCity}
+                                            province={venueState}
+                                            postal-code={venuePostalCode}>
+                                        </lightning-formatted-address>
+                                    </template>
+                                    <template if:false={hasVenueAddress}>
+                                        <span class="slds-text-color_weak slds-text-body_small">No venue set — use Venue search on the record page</span>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </lightning-record-edit-form>
                 </div>
