@@ -288,10 +288,11 @@ export default class ContractGenerator extends LightningElement {
             doc.addImage(adornedByVeenaLogo, 'PNG', MARGIN, 8, 38, 30);
             doc.setFontSize(18); doc.setFont('helvetica', 'bold');
             doc.text('EVENT PLANNING CONTRACT', 210 - MARGIN, 14, { align: 'right' });
-            doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
             doc.text(`Date: ${createdDate}`,  210 - MARGIN, 21, { align: 'right' });
             doc.text(`Event: ${oppName}`,      210 - MARGIN, 27, { align: 'right' });
             doc.text(`Client: ${clientName}`,  210 - MARGIN, 33, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
 
             y = 42;
             doc.setDrawColor(212, 175, 55); doc.setLineWidth(0.8);
@@ -342,7 +343,7 @@ export default class ContractGenerator extends LightningElement {
                     { content: `$${total.toFixed(2)}`, styles: { fontStyle: 'bold', halign: 'right' } }
                 ]);
                 descItems.forEach(item => {
-                    tableData.push([{ content: item.text, colSpan: 4, styles: { fontStyle: item.bold ? 'bold' : 'normal', textColor: [80, 80, 80], fontSize: 8.5 } }]);
+                    tableData.push([{ content: item.text, colSpan: 4, styles: { fontStyle: item.bold ? 'bold' : 'normal', textColor: [2, 12, 29], fontSize: 8.5 } }]);
                 });
             });
 
@@ -380,9 +381,11 @@ export default class ContractGenerator extends LightningElement {
             goldLine();
             // --- EVENT DETAILS ---
             h2('Event Details');
+            doc.setFont('helvetica', 'bold');
             bullet(`Event Name: ${oppName}`);
             bullet(`Event Date: ${eventDate}`);
             bullet(`Event Location: ${venue}`);
+            doc.setFont('helvetica', 'normal');
             goldLine();
 
             // --- COMPENSATION ---
@@ -396,10 +399,12 @@ export default class ContractGenerator extends LightningElement {
             doc.setTextColor(80, 80, 80);
             [
                 'Fees are subject to Texas State & Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.',
-                'Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.',
-                `Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.`
+                'Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.'
             ].forEach(t => bullet(t));
             doc.setTextColor(2, 12, 29);
+            doc.setFont('helvetica', 'bold');
+            bullet(`Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.`);
+            doc.setFont('helvetica', 'normal');
             goldLine();
 
             // --- RESPONSIBILITIES ---
@@ -548,7 +553,7 @@ export default class ContractGenerator extends LightningElement {
             const price = rec.fields.Sales_Price__c?.value != null ? rec.fields.Sales_Price__c.value : 0;
             const total = qty * price;
             return `<tr>
-                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:40%;font-weight:bold;">${name}${desc ? '<br/><span style="font-weight:normal;font-size:9pt;color:#444;">' + desc + '</span>' : ''}</td>
+                    <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:40%;font-weight:bold;">${name}${desc ? '<div style="font-weight:normal;font-size:9pt;color:#2c2c2c;">' + desc + '</div>' : ''}</td>
                     <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:10%;text-align:center;">${qty}</td>
                     <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:25%;text-align:right;">$${parseFloat(price).toFixed(2)}</td>
                     <td style="padding:8px;font-size:9pt;border-bottom:1px solid #D4AF37;vertical-align:top;width:25%;text-align:right;font-weight:bold;">$${total.toFixed(2)}</td>
@@ -600,9 +605,9 @@ ${goldLine}
 <div class="avoid-break">
     <h2>Event Details</h2>
     <ul class="contract-list">
-        <li><strong>Event Name:</strong> ${oppName}</li>
-        <li><strong>Event Date:</strong> ${eventDate}</li>
-        <li><strong>Event Location:</strong> ${venue}</li>
+        <li><strong>Event Name: ${oppName}</strong></li>
+        <li><strong>Event Date: ${eventDate}</strong></li>
+        <li><strong>Event Location: ${venue}</strong></li>
     </ul>
 </div>
 
@@ -622,6 +627,8 @@ ${goldLine}
     <ul class="contract-list" style="font-style:italic;color:#555;font-size:9.5pt;line-height:1.6;margin-top:15px;">
         <li>Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.</li>
         <li>Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.</li>
+    </ul>
+    <ul class="contract-list" style="font-size:9.5pt;line-height:1.6;">
         <li><strong>Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.</strong></li>
     </ul>
 </div>
