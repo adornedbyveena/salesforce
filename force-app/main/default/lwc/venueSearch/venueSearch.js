@@ -6,6 +6,7 @@ import getVenueDetails    from '@salesforce/apex/VenueSearchController.getVenueD
 import saveVenueAddress   from '@salesforce/apex/VenueSearchController.saveVenueAddress';
 import getDistanceToVenue from '@salesforce/apex/VenueSearchController.getDistanceToVenue';
 import clearVenue         from '@salesforce/apex/VenueSearchController.clearVenue';
+import getMapsApiKey      from '@salesforce/apex/ABVSettingsController.getMapsApiKey';
 
 // Only simple text fields via wire — compound address sub-fields read via Apex loadPlaceDetails
 const FIELDS = [
@@ -53,6 +54,10 @@ export default class VenueSearch extends LightningElement {
     _venueLat      = null;
     _venueLng      = null;
     _debounceTimer = null;
+    _mapsApiKey    = '';
+
+    @wire(getMapsApiKey)
+    wiredMapsKey({ data }) { if (data) this._mapsApiKey = data; }
 
     // ── Wire: Opportunity ──
     @wire(getRecord, { recordId: '$recordId', fields: FIELDS })
@@ -270,10 +275,9 @@ export default class VenueSearch extends LightningElement {
     buildStreetView(lat, lng) {
         this._venueLat = lat;
         this._venueLng = lng;
-        if (lat == null || lng == null) { this.streetViewUrl = null; return; }
-        const KEY = 'AIzaSyAOxiaHz5eFvX56W8dd3UMCxgte9fkJbNo';
+        if (lat == null || lng == null || !this._mapsApiKey) { this.streetViewUrl = null; return; }
         this.streetViewUrl =
-            `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${lat},${lng}&fov=80&key=${KEY}`;
+            `https://maps.googleapis.com/maps/api/streetview?size=600x300&location=${lat},${lng}&fov=80&key=${this._mapsApiKey}`;
         this.fetchDistance(lat, lng);
     }
 
