@@ -18,7 +18,6 @@ public with sharing class VenueSearchController {
             + '&components=country:us'
             + '&location=29.7604,-95.3698'
             + '&radius=700000'
-            + '&types=establishment'
             + '&key=' + KEY;
 
         HttpRequest req = new HttpRequest();
