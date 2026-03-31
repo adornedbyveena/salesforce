@@ -60,8 +60,8 @@
                             <lightning-input-field field-name="Deposit__c"></lightning-input-field>
                             <lightning-input-field field-name="Balance_Due__c"></lightning-input-field>
                             <lightning-input-field field-name="Deposit_Paid__c"></lightning-input-field>
-                            <lightning-input-field field-name="Venue__Street__s"></lightning-input-field>
-                            <lightning-input-field field-name="Venue__City__s"></lightning-input-field>
+                            <lightning-input-field field-name="Venue__Street__s" required></lightning-input-field>
+                            <lightning-input-field field-name="Venue__City__s" required></lightning-input-field>
                             <lightning-input-field field-name="Venue__StateCode__s"></lightning-input-field>
                             <lightning-input-field field-name="Venue__PostalCode__s"></lightning-input-field>
                         </div>
@@ -71,11 +71,12 @@
                     <template if:true={accountId}>
                         <lightning-record-edit-form record-id={accountId} object-api-name="Account" data-id="accForm" onsuccess={handleAccSuccess} onerror={handleFormError}>
                             <div class="slds-box slds-theme_shade">
-                                <lightning-input-field field-name="Name" required></lightning-input-field>
+                                <lightning-input-field field-name="FirstName" required></lightning-input-field>
+                                <lightning-input-field field-name="LastName" required></lightning-input-field>
                                 <lightning-input-field field-name="PersonEmail" required></lightning-input-field>
                                 <lightning-input-field field-name="Phone" required></lightning-input-field>
-                                <lightning-input-field field-name="BillingStreet"></lightning-input-field>
-                                <lightning-input-field field-name="BillingCity"></lightning-input-field>
+                                <lightning-input-field field-name="BillingStreet" required></lightning-input-field>
+                                <lightning-input-field field-name="BillingCity" required></lightning-input-field>
                                 <lightning-input-field field-name="BillingState"></lightning-input-field>
                                 <lightning-input-field field-name="BillingPostalCode"></lightning-input-field>
                             </div>

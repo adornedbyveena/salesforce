@@ -643,7 +643,9 @@ export default class ContractGenerator extends LightningElement {
         const venueZip    = this.oppRecordData.Venue__PostalCode__s?.value ?? this.oppData?.fields?.Venue__PostalCode__s?.value ?? '';
 
         const formulaName = this.oppData?.fields?.Client_Name_Formula__c?.value;
-        const accName     = this.accRecordData.Name?.value || '';
+        const firstName   = this.accRecordData.FirstName?.value || '';
+        const lastName    = this.accRecordData.LastName?.value  || '';
+        const accName     = this.accRecordData.Name?.value || (firstName + ' ' + lastName).trim() || '';
         const clientName  = formulaName || accName || 'Client';
 
         const createdDate   = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
