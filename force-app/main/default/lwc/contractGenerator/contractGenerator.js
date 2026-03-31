@@ -169,10 +169,15 @@ export default class ContractGenerator extends LightningElement {
             const isDepositPaid = this.oppRecordData.Deposit_Paid__c?.value   ?? this.oppData?.fields?.Deposit_Paid__c?.value   ?? false;
             const eventDateRaw  = this.oppRecordData.CloseDate?.value         || this.oppData?.fields?.CloseDate?.value         || '';
 
-            const billingStreet = this.oppData?.fields?.Venue__Street__s?.value    || '';
-            const billingCity   = this.oppData?.fields?.Venue__City__s?.value      || '';
-            const billingState  = this.oppData?.fields?.Venue__StateCode__s?.value || '';
-            const billingZip    = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
+            const billingStreet = this.accRecordData.BillingStreet?.value     || '';
+            const billingCity   = this.accRecordData.BillingCity?.value       || '';
+            const billingState  = this.accRecordData.BillingState?.value      || '';
+            const billingZip    = this.accRecordData.BillingPostalCode?.value || '';
+
+            const venueStreet = this.oppData?.fields?.Venue__Street__s?.value    || '';
+            const venueCity   = this.oppData?.fields?.Venue__City__s?.value      || '';
+            const venueState  = this.oppData?.fields?.Venue__StateCode__s?.value || '';
+            const venueZip    = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
 
             const formulaName  = this.oppData?.fields?.Client_Name_Formula__c?.value;
             const firstName    = this.accRecordData.FirstName?.value || '';
@@ -185,7 +190,7 @@ export default class ContractGenerator extends LightningElement {
                 ? new Date(eventDateRaw + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
                 : 'TBD';
             const clientAddress  = [billingStreet, billingCity, `${billingState} ${billingZip}`.trim()].filter(Boolean).join(', ');
-            const venue          = clientAddress || 'TBD';
+            const venue          = [venueStreet, venueCity, `${venueState} ${venueZip}`.trim()].filter(Boolean).join(', ') || 'TBD';
             const depositString  = isDepositPaid
                 ? `A non-refundable deposit of $${depAmt} was paid prior to this Agreement.`
                 : `A non-refundable deposit of $${depAmt} is due upon signing this Agreement.`;
@@ -512,6 +517,11 @@ export default class ContractGenerator extends LightningElement {
         const billingState  = this.accRecordData.BillingState?.value      || '';
         const billingZip    = this.accRecordData.BillingPostalCode?.value || '';
 
+        const venueStreet = this.oppData?.fields?.Venue__Street__s?.value    || '';
+        const venueCity   = this.oppData?.fields?.Venue__City__s?.value      || '';
+        const venueState  = this.oppData?.fields?.Venue__StateCode__s?.value || '';
+        const venueZip    = this.oppData?.fields?.Venue__PostalCode__s?.value || '';
+
         const formulaName = this.oppData?.fields?.Client_Name_Formula__c?.value;
         const accName     = this.accRecordData.Name?.value || '';
         const clientName  = formulaName || accName || 'Client';
@@ -521,7 +531,7 @@ export default class ContractGenerator extends LightningElement {
             ? new Date(eventDateRaw + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
             : 'TBD';
         const clientAddress = [billingStreet, billingCity, `${billingState} ${billingZip}`.trim()].filter(Boolean).join(', ');
-        const venue         = clientAddress || 'TBD';
+        const venue         = [venueStreet, venueCity, `${venueState} ${venueZip}`.trim()].filter(Boolean).join(', ') || 'TBD';
         const depositString = isDepositPaid
             ? `A non-refundable deposit of $${depAmt} was paid prior to this Agreement.`
             : `A non-refundable deposit of $${depAmt} is due upon signing this Agreement.`;
