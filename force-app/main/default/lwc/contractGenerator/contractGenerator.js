@@ -279,6 +279,102 @@ export default class ContractGenerator extends LightningElement {
                 }
             };
 
+            // Helper: right-aligned mixed bold/normal header line
+            const renderRightMixed = (boldPart, normalPart, yPos) => {
+                doc.setFontSize(9);
+                doc.setTextColor(2, 12, 29);
+                doc.setFont('helvetica', 'normal');
+                const normalW = doc.getTextWidth(normalPart);
+                doc.setFont('helvetica', 'bold');
+                const boldW = doc.getTextWidth(boldPart);
+                const startX = 210 - MARGIN - boldW - normalW;
+                doc.text(boldPart, startX, yPos);
+                doc.setFont('helvetica', 'normal');
+                doc.text(normalPart, startX + boldW, yPos);
+            };
+
+            // Helper: body paragraph with inline bold/normal segments
+            const renderMixedParagraph = (segments, indent = 0) => {
+                const allX = MARGIN + indent;
+                const maxW = CONTENT_W - indent;
+                doc.setFontSize(9);
+                doc.setTextColor(2, 12, 29);
+                const words = [];
+                segments.forEach(seg => {
+                    const parts = seg.text.split(' ');
+                    parts.forEach((part, i) => {
+                        if (part) words.push({ text: part, bold: seg.bold });
+                        if (i < parts.length - 1) words.push({ text: ' ', bold: false });
+                    });
+                });
+                const lines = [[]];
+                let lineW = 0;
+                words.forEach(word => {
+                    doc.setFont('helvetica', word.bold ? 'bold' : 'normal');
+                    const w = doc.getTextWidth(word.text);
+                    if (word.text === ' ') {
+                        if (lineW > 0 && lineW + w <= maxW) { lines[lines.length - 1].push(word); lineW += w; }
+                    } else if (lineW + w > maxW && lineW > 0) {
+                        const cur = lines[lines.length - 1];
+                        if (cur.length && cur[cur.length - 1].text === ' ') cur.pop();
+                        lines.push([word]); lineW = w;
+                    } else { lines[lines.length - 1].push(word); lineW += w; }
+                });
+                lines.forEach(line => {
+                    chk(5);
+                    let cx = allX;
+                    line.forEach(tok => {
+                        doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
+                        doc.text(tok.text, cx, y);
+                        cx += doc.getTextWidth(tok.text);
+                    });
+                    y += 5;
+                });
+                y += 1;
+            };
+
+            // Helper: bullet with inline bold/normal segments
+            const bulletMixed = (segments) => {
+                chk(6);
+                doc.setFontSize(9);
+                doc.setTextColor(2, 12, 29);
+                doc.text('\u2022', MARGIN, y);
+                const allX = MARGIN + 5;
+                const maxW = CONTENT_W - 5;
+                const words = [];
+                segments.forEach(seg => {
+                    const parts = seg.text.split(' ');
+                    parts.forEach((part, i) => {
+                        if (part) words.push({ text: part, bold: seg.bold });
+                        if (i < parts.length - 1) words.push({ text: ' ', bold: false });
+                    });
+                });
+                const lines = [[]];
+                let lineW = 0;
+                words.forEach(word => {
+                    doc.setFont('helvetica', word.bold ? 'bold' : 'normal');
+                    const w = doc.getTextWidth(word.text);
+                    if (word.text === ' ') {
+                        if (lineW > 0 && lineW + w <= maxW) { lines[lines.length - 1].push(word); lineW += w; }
+                    } else if (lineW + w > maxW && lineW > 0) {
+                        const cur = lines[lines.length - 1];
+                        if (cur.length && cur[cur.length - 1].text === ' ') cur.pop();
+                        lines.push([word]); lineW = w;
+                    } else { lines[lines.length - 1].push(word); lineW += w; }
+                });
+                lines.forEach((line, i) => {
+                    if (i > 0) chk(5);
+                    let cx = allX;
+                    line.forEach(tok => {
+                        doc.setFont('helvetica', tok.bold ? 'bold' : 'normal');
+                        doc.text(tok.text, cx, y);
+                        cx += doc.getTextWidth(tok.text);
+                    });
+                    if (i < lines.length - 1) y += 5;
+                });
+                y += 5;
+            };
+
             // --- PAGE 1 BACKGROUND ---
             doc.setFillColor(247, 231, 206);
             doc.rect(0, 0, 210, 297, 'F');
@@ -288,11 +384,9 @@ export default class ContractGenerator extends LightningElement {
             doc.addImage(adornedByVeenaLogo, 'PNG', MARGIN, 8, 38, 30);
             doc.setFontSize(18); doc.setFont('helvetica', 'bold');
             doc.text('EVENT PLANNING CONTRACT', 210 - MARGIN, 14, { align: 'right' });
-            doc.setFontSize(9); doc.setFont('helvetica', 'bold');
-            doc.text(`Date: ${createdDate}`,  210 - MARGIN, 21, { align: 'right' });
-            doc.text(`Event: ${oppName}`,      210 - MARGIN, 27, { align: 'right' });
-            doc.text(`Client: ${clientName}`,  210 - MARGIN, 33, { align: 'right' });
-            doc.setFont('helvetica', 'normal');
+            renderRightMixed('Date: ', createdDate, 21);
+            renderRightMixed('Event: ', oppName, 27);
+            renderRightMixed('Client: ', clientName, 33);
 
             y = 42;
             doc.setDrawColor(212, 175, 55); doc.setLineWidth(0.8);
@@ -301,9 +395,27 @@ export default class ContractGenerator extends LightningElement {
 
             // --- INTRODUCTION ---
             h2('Introduction');
-            body(`This Event Planning / Decor Contract Agreement ("Agreement") is entered into on ${createdDate} by and between:`);
-            bullet(`Adorned By Veena, LLC, a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at 19730 Shinnery Ridge Ct, Cypress, TX 77433, represented by Veena Boppana, Principal Designer (the "Company").`);
-            bullet(`${clientName}, an individual residing at ${clientAddress || 'address on file'} ("the Client").`);
+            renderMixedParagraph([
+                { text: 'This ', bold: false },
+                { text: 'Event Planning / Decor Contract Agreement ("Agreement")', bold: true },
+                { text: ' is entered into on ', bold: false },
+                { text: createdDate, bold: true },
+                { text: ' by and between:', bold: false }
+            ]);
+            bulletMixed([
+                { text: 'Adorned By Veena, LLC,', bold: true },
+                { text: ' a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at ', bold: false },
+                { text: '19730 Shinnery Ridge Ct, Cypress, TX 77433,', bold: true },
+                { text: ' represented by ', bold: false },
+                { text: 'Veena Boppana, Principal Designer', bold: true },
+                { text: ' (the "Company").', bold: false }
+            ]);
+            bulletMixed([
+                { text: `${clientName},`, bold: true },
+                { text: ' an individual residing at ', bold: false },
+                { text: `${clientAddress || 'address on file'}`, bold: true },
+                { text: ' ("the Client").', bold: false }
+            ]);
             body('The parties hereby agree as follows:');
             goldLine();
 
@@ -381,11 +493,9 @@ export default class ContractGenerator extends LightningElement {
             goldLine();
             // --- EVENT DETAILS ---
             h2('Event Details');
-            doc.setFont('helvetica', 'bold');
-            bullet(`Event Name: ${oppName}`);
-            bullet(`Event Date: ${eventDate}`);
-            bullet(`Event Location: ${venue}`);
-            doc.setFont('helvetica', 'normal');
+            bullet(oppName, 'Event Name: ');
+            bullet(eventDate, 'Event Date: ');
+            bullet(venue, 'Event Location: ');
             goldLine();
 
             // --- COMPENSATION ---
@@ -396,15 +506,18 @@ export default class ContractGenerator extends LightningElement {
             bullet(depositString);
             bullet(`Final Payment: The remaining balance of $${balAmt} is due no later than the day of the event.`);
             y += 2;
-            doc.setTextColor(80, 80, 80);
             [
                 'Fees are subject to Texas State & Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.',
                 'Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.'
             ].forEach(t => bullet(t));
-            doc.setTextColor(2, 12, 29);
-            doc.setFont('helvetica', 'bold');
-            bullet(`Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.`);
-            doc.setFont('helvetica', 'normal');
+            bulletMixed([
+                { text: 'Zelle payments', bold: true },
+                { text: ' should be directed to ', bold: false },
+                { text: 'adornedbyveena@gmail.com', bold: true },
+                { text: ' with the ', bold: false },
+                { text: `Inv Ref: ${oppName} - ${eventDate}`, bold: true },
+                { text: ' in the memo.', bold: false }
+            ]);
             goldLine();
 
             // --- RESPONSIBILITIES ---
@@ -560,15 +673,16 @@ export default class ContractGenerator extends LightningElement {
                 </tr>`;
         }).join('');
 
-        return `${goldLine}
+        return `<div style="color:#020C1D;font-family:Arial,sans-serif;">
+${goldLine}
 
 <h2>Introduction</h2>
 <p>This <strong>Event Planning / Decor Contract Agreement (&quot;Agreement&quot;)</strong> is entered into on <strong>${createdDate}</strong> by and between:</p>
 <ul class="contract-list">
-    <li><strong>Adorned By Veena, LLC</strong>, a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at <strong>19730 Shinnery Ridge Ct, Cypress, TX 77433, represented by Veena Boppana, Principal Designer (the &quot;Company&quot;)</strong>.</li>
-    <li><strong>${clientName}</strong>, an individual residing at <strong>${clientAddress || 'address on file'} (&quot;the Client&quot;)</strong>.</li>
+    <li><strong>Adorned By Veena, LLC,</strong> a limited liability company organized and existing under the laws of the State of Texas, with its principal office located at <strong>19730 Shinnery Ridge Ct, Cypress, TX 77433,</strong> represented by <strong>Veena Boppana, Principal Designer</strong> (the &quot;Company&quot;).</li>
+    <li><strong>${clientName},</strong> an individual residing at <strong>${clientAddress || 'address on file'}</strong> (&quot;the Client&quot;).</li>
 </ul>
-<p><strong>The parties hereby agree as follows:</strong></p>
+<p>The parties hereby agree as follows:</p>
 
 ${goldLine}
 
@@ -605,9 +719,9 @@ ${goldLine}
 <div class="avoid-break">
     <h2>Event Details</h2>
     <ul class="contract-list">
-        <li><strong>Event Name: ${oppName}</strong></li>
-        <li><strong>Event Date: ${eventDate}</strong></li>
-        <li><strong>Event Location: ${venue}</strong></li>
+        <li><strong>Event Name: </strong>${oppName}</li>
+        <li><strong>Event Date: </strong>${eventDate}</li>
+        <li><strong>Event Location: </strong>${venue}</li>
     </ul>
 </div>
 
@@ -624,12 +738,10 @@ ${goldLine}
         <li><strong>Deposit:</strong> ${depositString}</li>
         <li><strong>Final Payment:</strong> The remaining balance of <strong>$${balAmt}</strong> is due no later than the day of the event.</li>
     </ul>
-    <ul class="contract-list" style="font-style:italic;color:#555;font-size:9.5pt;line-height:1.6;margin-top:15px;">
+    <ul class="contract-list" style="font-size:9.5pt;line-height:1.6;margin-top:15px;">
         <li>Fees are subject to Texas State &amp; Local Sales Tax (currently 8.25% in Cypress/Harris County). Tax will be itemized on the final invoice unless otherwise specified.</li>
         <li>Payments are accepted via Zelle, Cash, or Credit Card. Credit Card payments incur a 3% convenience fee.</li>
-    </ul>
-    <ul class="contract-list" style="font-size:9.5pt;line-height:1.6;">
-        <li><strong>Zelle payments should be directed to adornedbyveena@gmail.com with the Inv Ref: ${oppName} - ${eventDate} in the memo.</strong></li>
+        <li><strong>Zelle payments</strong> should be directed to <strong>adornedbyveena@gmail.com</strong> with the <strong>Inv Ref: ${oppName} - ${eventDate}</strong> in the memo.</li>
     </ul>
 </div>
 
@@ -740,6 +852,7 @@ ${goldLine}
             </td>
         </tr>
     </table>
+</div>
 </div>`;
     }
 
