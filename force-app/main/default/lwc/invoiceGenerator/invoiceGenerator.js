@@ -129,7 +129,7 @@ export default class InvoiceGenerator extends LightningElement {
             Name: 'Name', CloseDate: 'Event Date',
             Total_Amount__c: 'Total Amount', Deposit__c: 'Deposit',
             Balance_Due__c: 'Balance Due', Deposit_Paid__c: 'Deposit Paid',
-            PersonEmail: 'Email', PersonMobilePhone: 'Mobile Phone',
+            PersonEmail: 'Email', Phone: 'Phone',
             BillingStreet: 'Billing Street', BillingCity: 'Billing City',
             BillingState: 'Billing State', BillingPostalCode: 'Billing Zip'
         };
@@ -261,7 +261,7 @@ export default class InvoiceGenerator extends LightningElement {
 
             const accName = this.accRecordData.Name?.value || this.oppData?.fields?.Account?.value?.fields?.Name?.value || '';
             const accEmail = this.accRecordData.PersonEmail?.value || this.accRecordData.Email?.value || '';
-            const accPhone = this.accRecordData.PersonMobilePhone?.value || this.accRecordData.Phone?.value || '';
+            const accPhone = this.accRecordData.Phone?.value || '';
             const street = this.oppData?.fields?.Venue__Street__s?.value    || '';
             const city   = this.oppData?.fields?.Venue__City__s?.value      || '';
             const state  = this.oppData?.fields?.Venue__StateCode__s?.value || '';

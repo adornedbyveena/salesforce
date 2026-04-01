@@ -83,13 +83,21 @@ public without sharing class QuoteSiteController {
 
         DateTime approvedAt = DateTime.now();
 
-        // Send confirmation email (callout must come before any DML)
+        // Send emails (callouts must come before any DML)
         try {
             GoogleGmailService.sendQuoteApprovedConfirmation(
                 clientEmail, clientName, eventName, approvedName, approvedAt
             );
         } catch (Exception e) {
             System.debug('Quote approval confirmation email failed: ' + e.getMessage());
+        }
+        try {
+            String oppUrl = URL.getOrgDomainUrl().toExternalForm() + '/' + opportunityId;
+            GoogleGmailService.sendInternalQuoteApproved(
+                clientName, clientEmail, eventName, approvedName, approvedAt, oppUrl
+            );
+        } catch (Exception e) {
+            System.debug('Quote approved internal notification failed: ' + e.getMessage());
         }
 
         update new Opportunity(
@@ -98,6 +106,12 @@ public without sharing class QuoteSiteController {
             Quote_Approved_Date_Time__c = approvedAt,
             Quote_Approved_Name__c    = approvedName.trim(),
             Quote_Approver_IP__c      = approverIp
+        );
+
+        ABVPushNotifier.notifyVeena(
+            'Quote Approved: ' + eventName,
+            clientName + ' has approved the quote.',
+            opportunityId
         );
 
         PageReference pr = Page.QuoteAcceptance;

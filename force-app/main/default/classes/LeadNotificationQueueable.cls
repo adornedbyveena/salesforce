@@ -54,6 +54,12 @@ public class LeadNotificationQueueable implements Queueable, Database.AllowsCall
             } catch (Exception e) {
                 System.debug('LeadNotification: internal alert email failed — ' + e.getMessage());
             }
+
+            ABVPushNotifier.notifyVeena(
+                'New Inquiry: ' + opp.Name,
+                clientName + ' submitted a new event inquiry.',
+                opp.Id
+            );
         }
     }
 }

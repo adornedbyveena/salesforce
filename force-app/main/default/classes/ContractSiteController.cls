@@ -88,14 +88,21 @@ public without sharing class ContractSiteController {
 
         DateTime signedAt = DateTime.now();
 
-        // Send confirmation email (callout must come before any DML)
+        // Send emails (callouts must come before any DML)
         try {
             GoogleGmailService.sendContractSignedConfirmation(
                 clientEmail, clientName, eventName, signedName, signedAt
             );
         } catch (Exception e) {
-            // Don't block signing if email fails — log and continue
             System.debug('Contract signed confirmation email failed: ' + e.getMessage());
+        }
+        try {
+            String oppUrl = URL.getOrgDomainUrl().toExternalForm() + '/' + opportunityId;
+            GoogleGmailService.sendInternalContractSigned(
+                clientName, clientEmail, eventName, signedName, signedAt, oppUrl
+            );
+        } catch (Exception e) {
+            System.debug('Contract signed internal notification failed: ' + e.getMessage());
         }
 
         // Update Opportunity directly with all signature details
@@ -106,6 +113,12 @@ public without sharing class ContractSiteController {
             Contract_Signed_Name__c      = signedName.trim(),
             Contract_Signer_IP__c        = signerIp,
             StageName                    = 'Contract Signed'
+        );
+
+        ABVPushNotifier.notifyVeena(
+            'Contract Signed: ' + eventName,
+            clientName + ' has signed the contract.',
+            opportunityId
         );
 
         PageReference pr = Page.ContractAcceptance;

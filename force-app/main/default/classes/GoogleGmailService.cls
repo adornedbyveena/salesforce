@@ -110,6 +110,60 @@ public class GoogleGmailService {
         sendSimpleEmail(toEmail, rendered[0], rendered[1]);
     }
 
+    public static void sendInternalContractSigned(
+        String clientName, String clientEmail,
+        String eventName, String signedName, DateTime signedAt,
+        String oppUrl
+    ) {
+        String subject = 'Contract Signed \u2013 ' + clientName + ' | ' + eventName;
+        String htmlBody = '<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">'
+            + '<div style="background:#D4AF37;padding:20px 24px;">'
+            + '<h2 style="color:#fff;margin:0;letter-spacing:2px;font-size:18px;">ADORNED BY VEENA</h2>'
+            + '<p style="color:#fff5d6;margin:4px 0 0;font-size:14px;">Contract Signed by Client</p>'
+            + '</div>'
+            + '<div style="padding:24px;background:#fff;">'
+            + '<h3 style="margin-top:0;color:#333;">' + eventName + '</h3>'
+            + '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+            + internalRow('Client',      clientName)
+            + internalRow('Email',       '<a href="mailto:' + clientEmail + '">' + clientEmail + '</a>')
+            + internalRow('Signed By',   signedName)
+            + internalRow('Signed At',   signedAt.format('MMMM d, yyyy \'at\' h:mm a z'))
+            + '</table>'
+            + '<p style="margin-top:24px;">'
+            + '<a href="' + oppUrl + '" style="background:#D4AF37;color:#fff;padding:10px 24px;'
+            + 'text-decoration:none;font-weight:bold;border-radius:4px;">View Opportunity</a>'
+            + '</p>'
+            + '</div></div>';
+        sendSimpleEmail('veena@adornedbyveena.com', subject, htmlBody);
+    }
+
+    public static void sendInternalQuoteApproved(
+        String clientName, String clientEmail,
+        String eventName, String approvedName, DateTime approvedAt,
+        String oppUrl
+    ) {
+        String subject = 'Quote Approved \u2013 ' + clientName + ' | ' + eventName;
+        String htmlBody = '<div style="font-family:Arial,sans-serif;max-width:640px;margin:0 auto;">'
+            + '<div style="background:#D4AF37;padding:20px 24px;">'
+            + '<h2 style="color:#fff;margin:0;letter-spacing:2px;font-size:18px;">ADORNED BY VEENA</h2>'
+            + '<p style="color:#fff5d6;margin:4px 0 0;font-size:14px;">Quote Approved by Client</p>'
+            + '</div>'
+            + '<div style="padding:24px;background:#fff;">'
+            + '<h3 style="margin-top:0;color:#333;">' + eventName + '</h3>'
+            + '<table style="width:100%;border-collapse:collapse;font-size:14px;">'
+            + internalRow('Client',      clientName)
+            + internalRow('Email',       '<a href="mailto:' + clientEmail + '">' + clientEmail + '</a>')
+            + internalRow('Approved By', approvedName)
+            + internalRow('Approved At', approvedAt.format('MMMM d, yyyy \'at\' h:mm a z'))
+            + '</table>'
+            + '<p style="margin-top:24px;">'
+            + '<a href="' + oppUrl + '" style="background:#D4AF37;color:#fff;padding:10px 24px;'
+            + 'text-decoration:none;font-weight:bold;border-radius:4px;">View Opportunity</a>'
+            + '</p>'
+            + '</div></div>';
+        sendSimpleEmail('veena@adornedbyveena.com', subject, htmlBody);
+    }
+
     public static void sendInternalLeadNotification(
         String clientName, String clientEmail, String clientPhone,
         String eventName, String eventType,
