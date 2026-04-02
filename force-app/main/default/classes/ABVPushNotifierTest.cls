@@ -3,7 +3,10 @@ private class ABVPushNotifierTest {
 
     @isTest
     static void notifyVeena_noException() {
-        Account acc = new Account(Name = 'Test Client');
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName='Test', LastName='Client');
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
         insert acc;
         Opportunity opp = new Opportunity(
             Name      = 'Test Event',

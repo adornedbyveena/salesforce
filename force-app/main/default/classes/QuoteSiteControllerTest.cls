@@ -3,9 +3,17 @@ private class QuoteSiteControllerTest {
 
     static final String TOKEN = 'quotetoken123test';
 
-    static Opportunity makeOpp(String quoteStatus) {
-        Account acc = new Account(Name = 'Test Client');
+    static Account makeAccount(String firstName, String lastName) {
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName=firstName, LastName=lastName);
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
         insert acc;
+        return acc;
+    }
+
+    static Opportunity makeOpp(String quoteStatus) {
+        Account acc = makeAccount('Test', 'Client');
         Opportunity opp = new Opportunity(
             Name              = 'Test Wedding',
             StageName         = 'Building Proposal',

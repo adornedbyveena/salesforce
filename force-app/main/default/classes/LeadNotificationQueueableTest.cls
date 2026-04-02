@@ -30,7 +30,7 @@ private class LeadNotificationQueueableTest {
             CloseDate     = Date.today().addDays(90),
             AccountId     = acc.Id,
             LeadSource    = 'Web',
-            Event_Type__c = 'Wedding'
+            Event_Type__c = 'Wedding Ceremony'
         );
         insert opp;
 
@@ -51,7 +51,10 @@ private class LeadNotificationQueueableTest {
 
     @isTest
     static void execute_noPersonEmail_skipsGracefully() {
-        Account acc = new Account(Name = 'No Email Corp');
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName='No', LastName='Email');
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
         insert acc;
         Opportunity opp = new Opportunity(
             Name      = 'Corp Event',
@@ -84,7 +87,10 @@ private class LeadNotificationQueueableTest {
 
     @isTest
     static void trigger_webNewInquiry_enqueuesJob() {
-        Account acc = new Account(Name = 'Trigger Test Client');
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName='Trigger', LastName='Client');
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
         insert acc;
 
         Test.startTest();
@@ -106,7 +112,10 @@ private class LeadNotificationQueueableTest {
 
     @isTest
     static void trigger_nonWebLead_noJob() {
-        Account acc = new Account(Name = 'Non-Web Client');
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName='NonWeb', LastName='Client');
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
         insert acc;
         Test.startTest();
         Opportunity opp = new Opportunity(

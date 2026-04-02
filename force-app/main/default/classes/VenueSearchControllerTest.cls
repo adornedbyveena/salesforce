@@ -27,6 +27,15 @@ private class VenueSearchControllerTest {
         + '"duration":{"text":"12 mins"}'
         + '}]}],"status":"OK"}';
 
+    static Account makeAccount(String firstName, String lastName) {
+        List<RecordType> rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true AND DeveloperName='Client' LIMIT 1];
+        if (rts.isEmpty()) rts = [SELECT Id FROM RecordType WHERE SobjectType='Account' AND IsPersonType=true LIMIT 1];
+        Account acc = new Account(FirstName=firstName, LastName=lastName);
+        if (!rts.isEmpty()) acc.RecordTypeId = rts[0].Id;
+        insert acc;
+        return acc;
+    }
+
     // ── searchVenues ──────────────────────────────────────────────────────────
 
     @isTest
@@ -125,8 +134,7 @@ private class VenueSearchControllerTest {
 
     @isTest
     static void saveVenueAddress_updatesOpportunity() {
-        Account acc = new Account(Name = 'Test Client');
-        insert acc;
+        Account acc = makeAccount('Test', 'Client');
         Opportunity opp = new Opportunity(
             Name = 'Test Event', StageName = 'New Inquiry',
             CloseDate = Date.today().addDays(30), AccountId = acc.Id
@@ -154,8 +162,7 @@ private class VenueSearchControllerTest {
 
     @isTest
     static void clearVenue_clearsFields() {
-        Account acc = new Account(Name = 'Test Client');
-        insert acc;
+        Account acc = makeAccount('Test', 'Client');
         Opportunity opp = new Opportunity(
             Name = 'Test Event', StageName = 'New Inquiry',
             CloseDate = Date.today().addDays(30), AccountId = acc.Id,
