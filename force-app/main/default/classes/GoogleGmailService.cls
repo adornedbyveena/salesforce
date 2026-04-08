@@ -172,7 +172,7 @@ public class GoogleGmailService {
         String services, String description,
         String oppUrl
     ) {
-        String subject = 'New Inquiry \u2013 ' + clientName + ' | ' + eventName;
+        String subject = 'New Inquiry - ' + clientName + ' | ' + eventName;
 
         String dateStr     = eventDate != null               ? eventDate.format()              : '\u2014';
         String altDateStr  = String.isNotBlank(altEventDate) ? altEventDate                    : '\u2014';
